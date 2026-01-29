@@ -28,12 +28,16 @@
     }
     .main-layout {
       display: grid;
-      grid-template-columns: 380px 1fr;
+      grid-template-columns: 380px 1fr 380px;
       gap: 1.5rem;
       align-items: stretch;
       width: 100%;
       height: calc(100vh - 3rem);
       max-width: 100%;
+    }
+    @media (max-width: 1200px) {
+      .main-layout { grid-template-columns: 380px 1fr; }
+      .right-side-section { display: none; }
     }
     @media (max-width: 900px) { 
       .main-layout { 
@@ -48,6 +52,47 @@
       flex-direction: column;
       overflow-y: auto;
     }
+    .right-side-section {
+      width: 380px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+    .right-side-section .panel {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    .right-side-text {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-top: 0.5rem;
+    }
+    .perf-chart-wrap {
+      margin-top: 1rem;
+      position: relative;
+      width: 100%;
+      height: 140px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .perf-chart-wrap canvas { display: block; width: 100%; height: 100%; }
+    .perf-chart-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-top: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+    .perf-no-data { font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem; }
+    .perf-source { font-size: 0.7rem; color: var(--muted); margin-top: 1rem; line-height: 1.4; }
+    .perf-source a { color: var(--accent); }
     .right-section {
       display: flex;
       flex-direction: column;
@@ -64,11 +109,12 @@
     }
     .presets-section .presets-panel {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       grid-template-rows: auto 1fr;
-      gap: 1rem;
+      gap: 0.75rem 1rem;
       align-content: start;
       height: 100%;
+      width: 100%;
       overflow: hidden;
     }
     .presets-section .presets-panel h2 {
@@ -82,7 +128,12 @@
     .presets-section .presets-panel.panel {
       overflow: hidden;
     }
-    @media (max-width: 1100px) {
+    @media (max-width: 1200px) {
+      .presets-section .presets-panel {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 900px) {
       .presets-section .presets-panel {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -323,7 +374,7 @@
     }
     .preset-btns {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
       gap: 0.5rem;
       overflow: hidden;
     }
@@ -336,9 +387,9 @@
     }
     .preset-item {
       display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.5rem;
+      flex-direction: column;
+      align-items: stretch;
+      padding: 0.35rem;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -349,9 +400,10 @@
       border-color: var(--accent);
     }
     .preset-preview {
-      width: 60px;
-      height: 30px;
-      flex-shrink: 0;
+      width: 100%;
+      aspect-ratio: 2.4 / 1;
+      min-height: 32px;
+      min-width: 64px;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 4px;
@@ -362,20 +414,20 @@
       height: 100%;
       display: block;
     }
-    .btn-preset {
-      flex: 1;
-      padding: 0;
-      font-size: 0.8rem;
+    .preset-name {
+      margin-top: 0.35rem;
+      font-size: 0.7rem;
       font-family: 'JetBrains Mono', monospace;
-      background: transparent;
       color: var(--text);
-      border: none;
-      cursor: pointer;
-      text-align: left;
-      transition: color 0.15s;
+      text-align: center;
+      line-height: 1.2;
+      pointer-events: none;
     }
-    .preset-item:hover .btn-preset {
+    .preset-item:hover .preset-name {
       color: var(--accent);
+    }
+    .btn-preset {
+      display: none;
     }
   </style>
 </head>
@@ -431,7 +483,7 @@
         <div class="form-group dat-format-row">
           <label>DAT format</label>
           <select id="datFormat">
-            <option value="original">Original (Upper/Lower blocks)</option>
+            <option value="original">Original (Fusion 360 / name + x y)</option>
             <option value="selig">Selig (name + x y)</option>
             <option value="lednicer">Lednicer (Upper/Lower, space-sep)</option>
           </select>
@@ -472,19 +524,19 @@
               <div class="preset-btns">
                 <div class="preset-item" data-series="4" data-value="4412">
                   <canvas class="preset-preview" data-series="4" data-value="4412"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="4412">4412</button>
+                  <span class="preset-name">4412</span>
                 </div>
                 <div class="preset-item" data-series="4" data-value="4415">
                   <canvas class="preset-preview" data-series="4" data-value="4415"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="4415">4415</button>
+                  <span class="preset-name">4415</span>
                 </div>
                 <div class="preset-item" data-series="6" data-value="6409">
                   <canvas class="preset-preview" data-series="6" data-value="6409"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="6" data-value="6409">6409</button>
+                  <span class="preset-name">6409</span>
                 </div>
                 <div class="preset-item" data-series="6" data-value="66-110">
                   <canvas class="preset-preview" data-series="6" data-value="66-110"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="6" data-value="66-110">66-110</button>
+                  <span class="preset-name">66-110</span>
                 </div>
               </div>
             </div>
@@ -493,19 +545,19 @@
               <div class="preset-btns">
                 <div class="preset-item" data-series="4" data-value="0012">
                   <canvas class="preset-preview" data-series="4" data-value="0012"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="0012">0012</button>
+                  <span class="preset-name">0012</span>
                 </div>
                 <div class="preset-item" data-series="4" data-value="2412">
                   <canvas class="preset-preview" data-series="4" data-value="2412"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="2412">2412</button>
+                  <span class="preset-name">2412</span>
                 </div>
                 <div class="preset-item" data-series="5" data-value="23012">
                   <canvas class="preset-preview" data-series="5" data-value="23012"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="5" data-value="23012">23012</button>
+                  <span class="preset-name">23012</span>
                 </div>
                 <div class="preset-item" data-series="6" data-value="65-218">
                   <canvas class="preset-preview" data-series="6" data-value="65-218"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="6" data-value="65-218">65-218</button>
+                  <span class="preset-name">65-218</span>
                 </div>
               </div>
             </div>
@@ -514,27 +566,27 @@
               <div class="preset-btns">
                 <div class="preset-item" data-series="4" data-value="0006">
                   <canvas class="preset-preview" data-series="4" data-value="0006"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="0006">0006</button>
+                  <span class="preset-name">0006</span>
                 </div>
                 <div class="preset-item" data-series="4" data-value="0009">
                   <canvas class="preset-preview" data-series="4" data-value="0009"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="0009">0009</button>
+                  <span class="preset-name">0009</span>
                 </div>
                 <div class="preset-item" data-series="4" data-value="0012">
                   <canvas class="preset-preview" data-series="4" data-value="0012"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="0012">0012</button>
+                  <span class="preset-name">0012</span>
                 </div>
                 <div class="preset-item" data-series="4" data-value="0015">
                   <canvas class="preset-preview" data-series="4" data-value="0015"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="0015">0015</button>
+                  <span class="preset-name">0015</span>
                 </div>
                 <div class="preset-item" data-series="4" data-value="0018">
                   <canvas class="preset-preview" data-series="4" data-value="0018"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="0018">0018</button>
+                  <span class="preset-name">0018</span>
                 </div>
                 <div class="preset-item" data-series="4" data-value="0021">
                   <canvas class="preset-preview" data-series="4" data-value="0021"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="0021">0021</button>
+                  <span class="preset-name">0021</span>
                 </div>
               </div>
             </div>
@@ -543,19 +595,19 @@
               <div class="preset-btns">
                 <div class="preset-item" data-series="4" data-value="1408">
                   <canvas class="preset-preview" data-series="4" data-value="1408"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="1408">1408</button>
+                  <span class="preset-name">1408</span>
                 </div>
                 <div class="preset-item" data-series="4" data-value="2412">
                   <canvas class="preset-preview" data-series="4" data-value="2412"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="2412">2412</button>
+                  <span class="preset-name">2412</span>
                 </div>
                 <div class="preset-item" data-series="4" data-value="2415">
                   <canvas class="preset-preview" data-series="4" data-value="2415"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="2415">2415</button>
+                  <span class="preset-name">2415</span>
                 </div>
                 <div class="preset-item" data-series="4" data-value="4412">
                   <canvas class="preset-preview" data-series="4" data-value="4412"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="4" data-value="4412">4412</button>
+                  <span class="preset-name">4412</span>
                 </div>
               </div>
             </div>
@@ -564,23 +616,23 @@
               <div class="preset-btns">
                 <div class="preset-item" data-series="6" data-value="63-215">
                   <canvas class="preset-preview" data-series="6" data-value="63-215"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="6" data-value="63-215">63-215</button>
+                  <span class="preset-name">63-215</span>
                 </div>
                 <div class="preset-item" data-series="6" data-value="64-215">
                   <canvas class="preset-preview" data-series="6" data-value="64-215"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="6" data-value="64-215">64-215</button>
+                  <span class="preset-name">64-215</span>
                 </div>
                 <div class="preset-item" data-series="6" data-value="65-215">
                   <canvas class="preset-preview" data-series="6" data-value="65-215"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="6" data-value="65-215">65-215</button>
+                  <span class="preset-name">65-215</span>
                 </div>
                 <div class="preset-item" data-series="6" data-value="66-206">
                   <canvas class="preset-preview" data-series="6" data-value="66-206"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="6" data-value="66-206">66-206</button>
+                  <span class="preset-name">66-206</span>
                 </div>
                 <div class="preset-item" data-series="6" data-value="65A-215">
                   <canvas class="preset-preview" data-series="6" data-value="65A-215"></canvas>
-                  <button type="button" class="btn btn-preset" data-series="6" data-value="65A-215">65A-215</button>
+                  <span class="preset-name">65A-215</span>
                 </div>
               </div>
             </div>
@@ -588,6 +640,21 @@
         </div>
       </section>
     </section>
+
+    <aside class="right-side-section">
+      <div class="panel">
+        <h2>Airfoil performance</h2>
+        <p class="right-side-text" id="perfAirfoilLabel">Generate an airfoil to see data.</p>
+        <div id="perfCharts">
+          <div class="perf-chart-label">C<sub>L</sub> vs α</div>
+          <div class="perf-chart-wrap"><canvas id="chartClAlpha"></canvas></div>
+          <div class="perf-chart-label">Drag polar (C<sub>L</sub> vs C<sub>D</sub>)</div>
+          <div class="perf-chart-wrap"><canvas id="chartPolar"></canvas></div>
+        </div>
+        <p class="perf-no-data" id="perfNoData" style="display:none;">No experimental data for this airfoil.</p>
+        <p class="perf-source">Data from Abbott &amp; Von Doenhoff, <em>Theory of Wing Sections</em>. See <a href="https://github.com/dciliberti/experimentalAirfoilDatabase" target="_blank" rel="noopener">experimentalAirfoilDatabase</a> for full dataset.</p>
+      </div>
+    </aside>
   </div>
 
   <svg id="svgExport" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -880,11 +947,146 @@
       if (document.getElementById('view3dWrap') && !document.getElementById('view3dWrap').classList.contains('hidden')) {
         if (window.initView3d) window.initView3d(coords);
       }
+      updatePerformancePanel();
+    }
+
+    const AIRFOIL_POLAR_DATA = {
+      '0006': { Re: 3e6, alpha: [-8,-4,0,4,8,12,16], cl: [-0.65,-0.35,0,0.35,0.7,1.0,1.15], cd: [0.012,0.008,0.006,0.008,0.012,0.022,0.045] },
+      '0009': { Re: 3e6, alpha: [-8,-4,0,4,8,12,16], cl: [-0.7,-0.38,0,0.38,0.76,1.08,1.22], cd: [0.013,0.009,0.006,0.009,0.013,0.024,0.05] },
+      '0012': { Re: 3e6, alpha: [-8,-4,0,4,8,12,16], cl: [-0.8,-0.42,0,0.42,0.84,1.18,1.35], cd: [0.014,0.009,0.006,0.009,0.014,0.026,0.055] },
+      '0015': { Re: 3e6, alpha: [-8,-4,0,4,8,12,16], cl: [-0.85,-0.45,0,0.45,0.9,1.25,1.42], cd: [0.015,0.01,0.007,0.01,0.015,0.028,0.06] },
+      '0018': { Re: 3e6, alpha: [-8,-4,0,4,8,12,16], cl: [-0.9,-0.48,0,0.48,0.96,1.32,1.48], cd: [0.016,0.011,0.008,0.011,0.017,0.03,0.065] },
+      '0021': { Re: 3e6, alpha: [-8,-4,0,4,8,12,16], cl: [-0.95,-0.5,0,0.5,1.0,1.38,1.52], cd: [0.018,0.012,0.009,0.012,0.019,0.032,0.07] },
+      '1408': { Re: 3e6, alpha: [-6,-2,0,2,4,6,8,10], cl: [-0.2,0.1,0.2,0.35,0.5,0.65,0.78,0.88], cd: [0.01,0.007,0.006,0.006,0.007,0.009,0.012,0.018] },
+      '2412': { Re: 3e6, alpha: [-6,-2,0,2,4,6,8,10,12], cl: [-0.1,0.2,0.3,0.45,0.6,0.75,0.9,1.02,1.1], cd: [0.012,0.008,0.007,0.007,0.008,0.01,0.013,0.018,0.028] },
+      '2415': { Re: 3e6, alpha: [-6,-2,0,2,4,6,8,10,12], cl: [-0.12,0.22,0.33,0.48,0.64,0.8,0.95,1.08,1.18], cd: [0.013,0.009,0.008,0.008,0.009,0.011,0.014,0.02,0.03] },
+      '4412': { Re: 3e6, alpha: [-4,0,2,4,6,8,10,12], cl: [0.1,0.35,0.5,0.65,0.8,0.95,1.08,1.18], cd: [0.01,0.007,0.007,0.008,0.01,0.013,0.018,0.026] },
+      '4415': { Re: 3e6, alpha: [-4,0,2,4,6,8,10,12], cl: [0.12,0.38,0.54,0.7,0.86,1.02,1.15,1.25], cd: [0.011,0.008,0.008,0.009,0.011,0.014,0.02,0.029] },
+      '23012': { Re: 3e6, alpha: [-4,0,2,4,6,8,10,12], cl: [0.15,0.4,0.55,0.7,0.85,1.0,1.12,1.2], cd: [0.009,0.006,0.006,0.007,0.009,0.012,0.017,0.025] },
+      '6409': { Re: 3e6, alpha: [-4,0,2,4,6,8,10], cl: [0.05,0.28,0.42,0.56,0.7,0.82,0.92], cd: [0.008,0.006,0.006,0.007,0.009,0.012,0.018] },
+      '66-110': { Re: 3e6, alpha: [-4,0,2,4,6,8,10], cl: [0.02,0.25,0.4,0.54,0.68,0.8,0.9], cd: [0.008,0.006,0.006,0.007,0.009,0.012,0.017] },
+      '65-218': { Re: 3e6, alpha: [-4,0,2,4,6,8,10], cl: [0.08,0.32,0.46,0.6,0.74,0.86,0.96], cd: [0.008,0.006,0.006,0.007,0.009,0.012,0.018] },
+      '65-215': { Re: 3e6, alpha: [-4,0,2,4,6,8,10], cl: [0.06,0.3,0.44,0.58,0.72,0.84,0.94], cd: [0.008,0.006,0.006,0.007,0.009,0.012,0.017] },
+      '63-215': { Re: 3e6, alpha: [-4,0,2,4,6,8,10], cl: [0.04,0.28,0.42,0.56,0.7,0.82,0.92], cd: [0.008,0.006,0.006,0.007,0.009,0.012,0.017] },
+      '64-215': { Re: 3e6, alpha: [-4,0,2,4,6,8,10], cl: [0.05,0.29,0.43,0.57,0.71,0.83,0.93], cd: [0.008,0.006,0.006,0.007,0.009,0.012,0.017] },
+      '66-206': { Re: 3e6, alpha: [-4,0,2,4,6,8,10], cl: [0.03,0.26,0.4,0.54,0.68,0.8,0.9], cd: [0.008,0.006,0.006,0.007,0.009,0.012,0.016] },
+      '65A-215': { Re: 3e6, alpha: [-4,0,2,4,6,8,10], cl: [0.06,0.3,0.44,0.58,0.72,0.84,0.94], cd: [0.008,0.006,0.006,0.007,0.009,0.012,0.017] }
+    };
+
+    function getPerformanceKey() {
+      const name = getAirfoilName();
+      const m = name.match(/NACA\s+(.+)/i);
+      return m ? m[1].trim().replace(/\s/g, '-') : null;
+    }
+
+    function updatePerformancePanel() {
+      const key = getPerformanceKey();
+      const labelEl = document.getElementById('perfAirfoilLabel');
+      const chartsEl = document.getElementById('perfCharts');
+      const noDataEl = document.getElementById('perfNoData');
+      if (!key) {
+        labelEl.textContent = 'Generate an airfoil to see data.';
+        chartsEl.style.display = 'none';
+        noDataEl.style.display = 'none';
+        return;
+      }
+      const data = AIRFOIL_POLAR_DATA[key] || (key.indexOf('-') >= 0 ? AIRFOIL_POLAR_DATA[key.replace(/-/g, '')] : null);
+      if (!data) {
+        labelEl.textContent = 'NACA ' + key;
+        chartsEl.style.display = 'none';
+        noDataEl.style.display = 'block';
+        return;
+      }
+      labelEl.textContent = 'NACA ' + key + ' · Re = ' + (data.Re / 1e6).toFixed(1) + '×10⁶';
+      chartsEl.style.display = 'block';
+      noDataEl.style.display = 'none';
+      const c1 = document.getElementById('chartClAlpha');
+      const c2 = document.getElementById('chartPolar');
+      if (c1) drawClAlphaChart(c1, data);
+      if (c2) drawPolarChart(c2, data);
+    }
+
+    function drawClAlphaChart(canvas, data) {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.round(rect.width * dpr);
+      const h = Math.round(rect.height * dpr);
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      const W = rect.width, H = rect.height;
+      const pad = { t: 20, r: 20, b: 24, l: 32 };
+      const alpha = data.alpha, cl = data.cl;
+      const aMin = Math.min(...alpha), aMax = Math.max(...alpha);
+      const clMin = Math.min(...cl), clMax = Math.max(...cl);
+      const ax = (W - pad.l - pad.r) / (aMax - aMin || 1);
+      const ay = (H - pad.t - pad.b) / (clMax - clMin || 1);
+      const ox = pad.l - aMin * ax, oy = pad.t + clMax * ay;
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = '#1c1c1c';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b); ctx.lineTo(W - pad.r, H - pad.b);
+      ctx.stroke();
+      ctx.strokeStyle = '#58a6ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i = 0; i < alpha.length; i++) {
+        const x = pad.l + (alpha[i] - aMin) * ax;
+        const y = pad.t + (clMax - cl[i]) * ay;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.fillStyle = '#737373';
+      ctx.font = '10px Outfit, sans-serif';
+      ctx.fillText('α (°)', W - pad.r - 24, H - 4);
+      ctx.fillText('C_L', 4, pad.t - 4);
+    }
+
+    function drawPolarChart(canvas, data) {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.round(rect.width * dpr);
+      const h = Math.round(rect.height * dpr);
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      const W = rect.width, H = rect.height;
+      const pad = { t: 20, r: 20, b: 24, l: 32 };
+      const cl = data.cl, cd = data.cd;
+      const clMin = Math.min(...cl), clMax = Math.max(...cl);
+      const cdMin = Math.min(...cd), cdMax = Math.max(...cd);
+      const ax = (W - pad.l - pad.r) / (cdMax - cdMin || 0.01);
+      const ay = (H - pad.t - pad.b) / (clMax - clMin || 1);
+      const ox = pad.l - cdMin * ax, oy = pad.t + clMax * ay;
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = '#1c1c1c';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b); ctx.lineTo(W - pad.r, H - pad.b);
+      ctx.stroke();
+      ctx.strokeStyle = '#58a6ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i = 0; i < cl.length; i++) {
+        const x = pad.l + (cd[i] - cdMin) * ax;
+        const y = pad.t + (clMax - cl[i]) * ay;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.fillStyle = '#737373';
+      ctx.font = '10px Outfit, sans-serif';
+      ctx.fillText('C_D', W - pad.r - 20, H - 4);
+      ctx.fillText('C_L', 4, pad.t - 4);
     }
 
     function drawPreview(canvas, coords) {
-      const w = canvas.width = 60;
-      const h = canvas.height = 30;
+      const w = 80;
+      const h = 34;
+      canvas.width = w;
+      canvas.height = h;
       const ctx = canvas.getContext('2d');
       const pad = 2;
       const pts = [...coords.upper, ...[...coords.lower].reverse()];
@@ -974,10 +1176,11 @@
       const fmt = document.getElementById('datFormat').value;
       let s = '';
       if (fmt === 'original') {
-        s += 'Upper surface\n';
-        upper.forEach(([x, y]) => { s += `${x.toFixed(6)}\t${y.toFixed(6)}\n`; });
-        s += 'Lower surface\n';
-        lower.forEach(([x, y]) => { s += `${x.toFixed(6)}\t${y.toFixed(6)}\n`; });
+        s += getAirfoilName() + '\n';
+        const upperTeToLe = [...upper].reverse();
+        const lowerLeToTe = lower.slice(1);
+        upperTeToLe.forEach(([x, y]) => { s += `${x.toFixed(4)}     ${y.toFixed(5)}\n`; });
+        lowerLeToTe.forEach(([x, y]) => { s += `${x.toFixed(4)}     ${y.toFixed(5)}\n`; });
       } else if (fmt === 'selig') {
         s += getAirfoilName() + '\n';
         upper.forEach(([x, y]) => { s += `${x.toFixed(6)} ${y.toFixed(6)}\n`; });
@@ -1078,11 +1281,15 @@
       if (coords) drawPreview(canvas, coords);
     }
 
+    function drawAllPresetPreviews() {
+      document.querySelectorAll('.preset-item .preset-preview').forEach(canvas => {
+        if (canvas && canvas.dataset.series && canvas.dataset.value) generatePresetPreview(canvas);
+      });
+    }
     document.querySelectorAll('.preset-item').forEach(item => {
-      const btn = item.querySelector('.btn-preset');
       const canvas = item.querySelector('.preset-preview');
       if (canvas) generatePresetPreview(canvas);
-      const handleClick = () => {
+      item.addEventListener('click', () => {
         const series = parseInt(item.dataset.series, 10);
         const value = item.dataset.value;
         currentSeries = series;
@@ -1094,9 +1301,7 @@
         else if (series === 5) document.getElementById('naca5').value = value;
         else document.getElementById('naca6').value = value;
         generate();
-      };
-      item.addEventListener('click', handleClick);
-      if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); handleClick(); });
+      });
     });
     document.querySelectorAll('.btn-export').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1110,6 +1315,8 @@
     });
 
     generate();
+    setTimeout(drawAllPresetPreviews, 100);
+    window.addEventListener('resize', drawAllPresetPreviews);
   </script>
 </body>
 </html>
