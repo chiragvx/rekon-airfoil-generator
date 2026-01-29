@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rekon Labs - NACA Airfoil Generator</title>
+  <link rel="icon" href="assets/favicon.png" type="image/png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Orbitron:wght@500;700&family=Outfit:wght@400;600;700&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #000000;
+      --surface: #0a0a0a;
+      --border: #1c1c1c;
+      --text: #e8e8e8;
+      --muted: #737373;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --orange: #d29922;
+    }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      padding: 1.5rem;
+    }
+    .main-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 1.5rem;
+      align-items: stretch;
+      width: 100%;
+      height: calc(100vh - 3rem);
+      max-width: 100%;
+    }
+    @media (max-width: 900px) { 
+      .main-layout { 
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      body { overflow-y: auto; }
+    }
+    .left-section { 
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .right-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .presets-section { 
+      margin: 0; 
+      padding: 0;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .presets-section .presets-panel {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto 1fr;
+      gap: 1rem;
+      align-content: start;
+      height: 100%;
+      overflow: hidden;
+    }
+    .presets-section .presets-panel h2 {
+      grid-column: 1 / -1;
+      margin-bottom: 0;
+    }
+    .presets-section .presets-panel .preset-group {
+      min-height: 0;
+      overflow: hidden;
+    }
+    .presets-section .presets-panel.panel {
+      overflow: hidden;
+    }
+    @media (max-width: 1100px) {
+      .presets-section .presets-panel {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .presets-section .presets-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .page-header .logo {
+      height: 48px;
+      width: auto;
+      display: block;
+      flex-shrink: 0;
+    }
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      overflow-y: auto;
+    }
+    .panel h2 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .series-tabs {
+      display: flex;
+      gap: 0.25rem;
+      margin-bottom: 1rem;
+    }
+    .series-tabs button {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .series-tabs button:hover { border-color: var(--accent); color: var(--text); }
+    .series-tabs button.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .series-params { display: none; }
+    .series-params.active { display: block; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+    .btn-primary:hover { filter: brightness(1.15); }
+    .export-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .btn-export {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      flex: 1;
+      min-width: 80px;
+    }
+    .btn-export:hover { border-color: var(--green); color: var(--green); }
+    .viewer-area {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .view-mode-switch {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      z-index: 10;
+      display: flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .view-mode-switch button {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.75rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .view-mode-switch button:hover { color: var(--text); }
+    .view-mode-switch button.active {
+      color: var(--bg);
+      background: var(--accent);
+    }
+    .view-3d-mode-switch {
+      position: absolute;
+      bottom: 0.75rem;
+      right: 0.75rem;
+      z-index: 10;
+      display: flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .view-3d-mode-switch.hidden { display: none; }
+    .view-3d-mode-switch button {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.75rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .view-3d-mode-switch button:hover { color: var(--text); }
+    .view-3d-mode-switch button.active {
+      color: var(--bg);
+      background: var(--accent);
+    }
+    .view-2d-wrap, .view-3d-wrap {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .view-2d-wrap.hidden, .view-3d-wrap.hidden { display: none; }
+    #previewCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    #view3dCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    #svgExport { position: absolute; left: -9999px; }
+    .hint { font-size: 0.7rem; color: var(--muted); margin-top: 0.25rem; }
+    .points-row { margin-top: 1rem; }
+    .slider-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.35rem;
+    }
+    .slider-input-wrap input[type="range"] {
+      flex: 1;
+      min-width: 0;
+      accent-color: var(--accent);
+    }
+    .points-num {
+      width: 4.5rem;
+      flex-shrink: 0;
+      text-align: center;
+    }
+    .dat-format-row { margin-bottom: 0.75rem; }
+    .dat-format-row select {
+      margin-top: 0.25rem;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.6rem;
+    }
+    .presets { margin-top: 0.75rem; }
+    .preset-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      overflow: hidden;
+    }
+    .preset-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      overflow: hidden;
+    }
+    .preset-label {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .preset-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .preset-item:hover {
+      border-color: var(--accent);
+    }
+    .preset-preview {
+      width: 60px;
+      height: 30px;
+      flex-shrink: 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .preset-preview canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .btn-preset {
+      flex: 1;
+      padding: 0;
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      background: transparent;
+      color: var(--text);
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      transition: color 0.15s;
+    }
+    .preset-item:hover .btn-preset {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <aside class="left-section">
+      <header class="page-header">
+        <img src="assets/logo.png" alt="" class="logo">
+        <h1>Rekon Labs - NACA Airfoil Generator</h1>
+      </header>
+      <div class="panel">
+        <h2>Series</h2>
+        <div class="series-tabs">
+          <button type="button" data-series="4" class="active">4-digit</button>
+          <button type="button" data-series="5">5-digit</button>
+          <button type="button" data-series="6">6-digit</button>
+        </div>
+
+        <div id="params4" class="series-params active">
+          <div class="form-group">
+            <label>NACA 4-digit (e.g. 2412)</label>
+            <input type="text" id="naca4" value="2412" placeholder="MPTT" maxlength="4">
+            <div class="hint">M=camber%, P=position×10, TT=thickness%</div>
+          </div>
+        </div>
+        <div id="params5" class="series-params">
+          <div class="form-group">
+            <label>NACA 5-digit (e.g. 23012)</label>
+            <input type="text" id="naca5" value="23012" placeholder="LPPTT" maxlength="5">
+            <div class="hint">L=CL×0.15, P=position, TT=thickness%</div>
+          </div>
+        </div>
+        <div id="params6" class="series-params">
+          <div class="form-group">
+            <label>NACA 6-series (63, 64, 65, 66, 67, 63A, 64A, 65A)</label>
+            <input type="text" id="naca6" value="65-215" placeholder="e.g. 65-215, 65A-215, 63-412">
+            <div class="hint">6 + family (3|4|5|6|7 or 3A|4A|5A) + - + CL×10 + thickness%. E.g. 65-215, 63A-412</div>
+          </div>
+        </div>
+
+        <div class="form-group points-row">
+          <label>Number of points</label>
+          <div class="slider-input-wrap">
+            <input type="range" id="pointsSlider" min="20" max="500" value="80" step="5">
+            <input type="number" id="pointsInput" min="20" max="500" value="80" class="points-num">
+          </div>
+          <div class="hint">Points per surface (affects export resolution)</div>
+        </div>
+
+        <button type="button" class="btn btn-primary" id="generateBtn">Generate</button>
+
+        <h2 style="margin-top: 1.25rem;">Export</h2>
+        <div class="form-group dat-format-row">
+          <label>DAT format</label>
+          <select id="datFormat">
+            <option value="original">Original (Upper/Lower blocks)</option>
+            <option value="selig">Selig (name + x y)</option>
+            <option value="lednicer">Lednicer (Upper/Lower, space-sep)</option>
+          </select>
+        </div>
+        <div class="export-row">
+          <button type="button" class="btn btn-export" data-format="dat">DAT</button>
+          <button type="button" class="btn btn-export" data-format="csv">CSV</button>
+          <button type="button" class="btn btn-export" data-format="svg">SVG</button>
+          <button type="button" class="btn btn-export" data-format="png">PNG</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="right-section">
+      <div class="panel viewer-area">
+        <div class="view-mode-switch">
+          <button type="button" id="view2dBtn" class="active">2D</button>
+          <button type="button" id="view3dBtn">3D</button>
+        </div>
+        <div class="view-3d-mode-switch hidden" id="view3dModeSwitch">
+          <button type="button" id="wireframeBtn" class="active">Wireframe</button>
+          <button type="button" id="solidBtn">Solid</button>
+        </div>
+        <div class="view-2d-wrap" id="view2dWrap">
+          <canvas id="previewCanvas"></canvas>
+        </div>
+        <div class="view-3d-wrap hidden" id="view3dWrap">
+          <canvas id="view3dCanvas"></canvas>
+        </div>
+      </div>
+
+      <section class="presets-section">
+        <div class="panel presets-panel">
+          <h2>Popular by use case</h2>
+          <div class="presets">
+            <div class="preset-group">
+              <span class="preset-label">Low Reynolds</span>
+              <div class="preset-btns">
+                <div class="preset-item" data-series="4" data-value="4412">
+                  <canvas class="preset-preview" data-series="4" data-value="4412"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="4412">4412</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="4415">
+                  <canvas class="preset-preview" data-series="4" data-value="4415"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="4415">4415</button>
+                </div>
+                <div class="preset-item" data-series="6" data-value="6409">
+                  <canvas class="preset-preview" data-series="6" data-value="6409"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="6" data-value="6409">6409</button>
+                </div>
+                <div class="preset-item" data-series="6" data-value="66-110">
+                  <canvas class="preset-preview" data-series="6" data-value="66-110"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="6" data-value="66-110">66-110</button>
+                </div>
+              </div>
+            </div>
+            <div class="preset-group">
+              <span class="preset-label">High Reynolds</span>
+              <div class="preset-btns">
+                <div class="preset-item" data-series="4" data-value="0012">
+                  <canvas class="preset-preview" data-series="4" data-value="0012"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="0012">0012</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="2412">
+                  <canvas class="preset-preview" data-series="4" data-value="2412"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="2412">2412</button>
+                </div>
+                <div class="preset-item" data-series="5" data-value="23012">
+                  <canvas class="preset-preview" data-series="5" data-value="23012"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="5" data-value="23012">23012</button>
+                </div>
+                <div class="preset-item" data-series="6" data-value="65-218">
+                  <canvas class="preset-preview" data-series="6" data-value="65-218"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="6" data-value="65-218">65-218</button>
+                </div>
+              </div>
+            </div>
+            <div class="preset-group">
+              <span class="preset-label">Symmetrical</span>
+              <div class="preset-btns">
+                <div class="preset-item" data-series="4" data-value="0006">
+                  <canvas class="preset-preview" data-series="4" data-value="0006"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="0006">0006</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0009">
+                  <canvas class="preset-preview" data-series="4" data-value="0009"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="0009">0009</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0012">
+                  <canvas class="preset-preview" data-series="4" data-value="0012"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="0012">0012</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0015">
+                  <canvas class="preset-preview" data-series="4" data-value="0015"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="0015">0015</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0018">
+                  <canvas class="preset-preview" data-series="4" data-value="0018"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="0018">0018</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0021">
+                  <canvas class="preset-preview" data-series="4" data-value="0021"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="0021">0021</button>
+                </div>
+              </div>
+            </div>
+            <div class="preset-group">
+              <span class="preset-label">Cambered (4-digit)</span>
+              <div class="preset-btns">
+                <div class="preset-item" data-series="4" data-value="1408">
+                  <canvas class="preset-preview" data-series="4" data-value="1408"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="1408">1408</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="2412">
+                  <canvas class="preset-preview" data-series="4" data-value="2412"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="2412">2412</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="2415">
+                  <canvas class="preset-preview" data-series="4" data-value="2415"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="2415">2415</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="4412">
+                  <canvas class="preset-preview" data-series="4" data-value="4412"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="4" data-value="4412">4412</button>
+                </div>
+              </div>
+            </div>
+            <div class="preset-group">
+              <span class="preset-label">Special (laminar / 6-series)</span>
+              <div class="preset-btns">
+                <div class="preset-item" data-series="6" data-value="63-215">
+                  <canvas class="preset-preview" data-series="6" data-value="63-215"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="6" data-value="63-215">63-215</button>
+                </div>
+                <div class="preset-item" data-series="6" data-value="64-215">
+                  <canvas class="preset-preview" data-series="6" data-value="64-215"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="6" data-value="64-215">64-215</button>
+                </div>
+                <div class="preset-item" data-series="6" data-value="65-215">
+                  <canvas class="preset-preview" data-series="6" data-value="65-215"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="6" data-value="65-215">65-215</button>
+                </div>
+                <div class="preset-item" data-series="6" data-value="66-206">
+                  <canvas class="preset-preview" data-series="6" data-value="66-206"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="6" data-value="66-206">66-206</button>
+                </div>
+                <div class="preset-item" data-series="6" data-value="65A-215">
+                  <canvas class="preset-preview" data-series="6" data-value="65A-215"></canvas>
+                  <button type="button" class="btn btn-preset" data-series="6" data-value="65A-215">65A-215</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </div>
+
+  <svg id="svgExport" xmlns="http://www.w3.org/2000/svg"></svg>
+
+  <script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    let scene3d, camera3d, renderer3d, mesh3d, controls3d;
+    let animId = null;
+    let isWireframe = true;
+    let dirLight, ambLight;
+
+    window.initView3d = function(coords) {
+      const canvas = document.getElementById('view3dCanvas');
+      if (!canvas || !coords || !coords.upper.length) return;
+      const { upper, lower } = coords;
+      const pts = [...upper, ...lower.slice(1).reverse()];
+      const shape = new THREE.Shape();
+      for (let i = 0; i < pts.length; i++) {
+        const [x, y] = pts[i];
+        if (i === 0) shape.moveTo(x, y);
+        else shape.lineTo(x, y);
+      }
+      shape.closePath();
+      const extrudeSettings = { depth: 0.25, bevelEnabled: false };
+      const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+      geometry.center();
+      geometry.computeVertexNormals();
+      if (mesh3d && scene3d) scene3d.remove(mesh3d);
+      if (mesh3d && mesh3d.geometry) mesh3d.geometry.dispose();
+      if (mesh3d && mesh3d.material) mesh3d.material.dispose();
+      let mat;
+      if (isWireframe) {
+        mat = new THREE.MeshBasicMaterial({
+          color: 0x58a6ff,
+          wireframe: true,
+          side: THREE.DoubleSide,
+        });
+      } else {
+        mat = new THREE.MeshStandardMaterial({
+          color: 0x888888,
+          metalness: 0.7,
+          roughness: 0.3,
+          side: THREE.DoubleSide,
+        });
+      }
+      mesh3d = new THREE.Mesh(geometry, mat);
+      if (!scene3d) {
+        scene3d = new THREE.Scene();
+        scene3d.background = new THREE.Color(0x0a0a0a);
+        dirLight = new THREE.DirectionalLight(0xffffff, isWireframe ? 0.9 : 1.5);
+        dirLight.position.set(2, 2, 2);
+        scene3d.add(dirLight);
+        ambLight = new THREE.AmbientLight(0xffffff, isWireframe ? 0.15 : 0.4);
+        scene3d.add(ambLight);
+        camera3d = new THREE.PerspectiveCamera(50, 1, 0.01, 100);
+        camera3d.position.set(0.8, 0.5, 1.2);
+        camera3d.lookAt(0, 0, 0);
+        renderer3d = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+        renderer3d.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+        controls3d = new OrbitControls(camera3d, canvas);
+        controls3d.enableDamping = true;
+        controls3d.dampingFactor = 0.05;
+      } else {
+        if (dirLight && ambLight) updateLighting();
+      }
+      scene3d.add(mesh3d);
+      resize3d();
+      render3d();
+    };
+
+    function updateLighting() {
+      if (!dirLight || !ambLight) return;
+      if (isWireframe) {
+        dirLight.intensity = 0.9;
+        ambLight.intensity = 0.15;
+      } else {
+        dirLight.intensity = 1.5;
+        ambLight.intensity = 0.4;
+      }
+    }
+
+    window.toggleWireframe = function() {
+      isWireframe = true;
+      document.getElementById('wireframeBtn').classList.add('active');
+      document.getElementById('solidBtn').classList.remove('active');
+      if (mesh3d && lastCoords.upper.length) {
+        const coords = lastCoords;
+        initView3d(coords);
+      }
+    };
+
+    window.toggleSolid = function() {
+      isWireframe = false;
+      document.getElementById('wireframeBtn').classList.remove('active');
+      document.getElementById('solidBtn').classList.add('active');
+      if (mesh3d && lastCoords.upper.length) {
+        const coords = lastCoords;
+        initView3d(coords);
+      }
+    };
+
+    function resize3d() {
+      const canvas = document.getElementById('view3dCanvas');
+      if (!renderer3d || !canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width, h = rect.height;
+      if (canvas.width !== w || canvas.height !== h) {
+        renderer3d.setSize(w, h);
+        camera3d.aspect = w / h;
+        camera3d.updateProjectionMatrix();
+      }
+    }
+
+    function render3d() {
+      if (!renderer3d || !scene3d) return;
+      resize3d();
+      controls3d && controls3d.update();
+      renderer3d.render(scene3d, camera3d);
+      animId = requestAnimationFrame(render3d);
+    }
+
+    window.stopView3d = function() {
+      if (animId) cancelAnimationFrame(animId);
+      animId = null;
+    };
+
+    window.switchTo3d = function(coords) {
+      document.getElementById('view2dWrap').classList.add('hidden');
+      document.getElementById('view3dWrap').classList.remove('hidden');
+      document.getElementById('view3dModeSwitch').classList.remove('hidden');
+      document.getElementById('view2dBtn').classList.remove('active');
+      document.getElementById('view3dBtn').classList.add('active');
+      requestAnimationFrame(() => {
+        initView3d(coords);
+        animId = requestAnimationFrame(render3d);
+      });
+    };
+
+    window.switchTo2d = function() {
+      stopView3d();
+      document.getElementById('view2dWrap').classList.remove('hidden');
+      document.getElementById('view3dWrap').classList.add('hidden');
+      document.getElementById('view3dModeSwitch').classList.add('hidden');
+      document.getElementById('view2dBtn').classList.add('active');
+      document.getElementById('view3dBtn').classList.remove('active');
+    };
+
+    window.addEventListener('resize', () => { if (document.getElementById('view3dWrap').classList.contains('hidden')) return; resize3d(); });
+  </script>
+  <script>
+    let currentSeries = 4;
+    let lastCoords = { upper: [], lower: [] };
+
+    function getNumPoints() {
+      const v = parseInt(document.getElementById('pointsInput').value, 10);
+      return Math.min(500, Math.max(20, isNaN(v) ? 80 : v));
+    }
+
+    function syncPointsUI() {
+      const n = getNumPoints();
+      document.getElementById('pointsSlider').value = n;
+      document.getElementById('pointsInput').value = n;
+    }
+
+    // ---- NACA 4-digit ----
+    function naca4digit(code, numPoints) {
+      const m = parseInt(code[0], 10) / 100;
+      const p = parseInt(code[1], 10) / 10;
+      const t = parseInt(code.slice(2), 10) / 100;
+      const n = numPoints;
+      const coords = { upper: [], lower: [] };
+      for (let i = 0; i <= n; i++) {
+        const x = i / n;
+        const yt = (t / 0.2) * (0.2969 * Math.sqrt(x) - 0.1260 * x - 0.3516 * x * x + 0.2843 * x * x * x - 0.1015 * x * x * x * x);
+        let yc, dyc;
+        if (x < p && p > 0) {
+          yc = (m / (p * p)) * (2 * p * x - x * x);
+          dyc = (m / (p * p)) * (2 * p - 2 * x);
+        } else {
+          yc = (m / ((1 - p) * (1 - p))) * ((1 - 2 * p) + 2 * p * x - x * x);
+          dyc = (m / ((1 - p) * (1 - p))) * (2 * p - 2 * x);
+        }
+        const th = Math.atan2(dyc, 1);
+        coords.upper.push([x - yt * Math.sin(th), yc + yt * Math.cos(th)]);
+        coords.lower.push([x + yt * Math.sin(th), yc - yt * Math.cos(th)]);
+      }
+      return coords;
+    }
+
+    // ---- NACA 5-digit ----
+    function naca5digit(code, numPoints) {
+      const q = parseInt(code[0], 10);
+      const p = 0.05 * parseInt(code[1], 10);
+      const t = parseInt(code.slice(2), 10) / 100;
+      const r = 1.1019 * (q * 0.15) * (q * 0.15);
+      const k1 = 15.957 * (q * 0.15) - 3.23;
+      const k2 = (r - p * p * k1 - (1 - p) * (1 - p)) / ((1 - p) * (1 - p));
+      const n = numPoints;
+      const coords = { upper: [], lower: [] };
+      for (let i = 0; i <= n; i++) {
+        const x = i / n;
+        const yt = (t / 0.2) * (0.2969 * Math.sqrt(x) - 0.1260 * x - 0.3516 * x * x + 0.2843 * x * x * x - 0.1015 * x * x * x * x);
+        let yc, dyc;
+        if (x < p) {
+          yc = (k1 / 6) * (x * x * x - 3 * p * x * x + p * p * (3 - p) * x);
+          dyc = (k1 / 6) * (3 * x * x - 6 * p * x + p * p * (3 - p));
+        } else {
+          yc = (k1 / 6) * (p * p * p) + (k2 / 6) * ((1 - x) * (1 - x) * (1 - x) - (1 - p) * (1 - p) * (1 - p) + 3 * (1 - p) * (1 - x) * ((1 - x) - (1 - p)));
+          dyc = -(k2 / 6) * (3 * (1 - x) * (1 - x) - 3 * (1 - p) * (1 - p) + 6 * (1 - p) * ((1 - x) - (1 - p)));
+        }
+        const th = Math.atan2(dyc, 1);
+        coords.upper.push([x - yt * Math.sin(th), yc + yt * Math.cos(th)]);
+        coords.lower.push([x + yt * Math.sin(th), yc - yt * Math.cos(th)]);
+      }
+      return coords;
+    }
+
+    // ---- NACA 6-series (63, 64, 65, 66, 67, 63A, 64A, 65A) ----
+    const SIX_FAMILIES = { '3': 0.3, '4': 0.4, '5': 0.5, '6': 0.6, '7': 0.7 };
+    function parse6series(code) {
+      const str = code.replace(/\s/g, '').replace(/-/g, '').toUpperCase();
+      if (str[0] !== '6') return null;
+      let xMin, cl, t, is6A = false;
+      if (str[1] === 'A') return null;
+      if (str[2] === 'A') {
+        if (str.length < 6) return null;
+        const fam = str[1];
+        if (fam !== '3' && fam !== '4' && fam !== '5') return null;
+        is6A = true;
+        xMin = SIX_FAMILIES[fam];
+        cl = parseInt(str[3], 10) / 10;
+        const tt = str.slice(4);
+        t = parseInt(tt.length >= 2 ? tt : tt + '0', 10) / 100;
+      } else {
+        if (str.length < 5) return null;
+        const fam = str[1];
+        if (!SIX_FAMILIES[fam]) return null;
+        xMin = SIX_FAMILIES[fam];
+        cl = parseInt(str[2], 10) / 10;
+        const tt = str.slice(3);
+        t = parseInt(tt.length >= 2 ? tt : tt + '0', 10) / 100;
+      }
+      return { xMin, cl, t, is6A };
+    }
+    function naca6digit(code, numPoints) {
+      const parsed = parse6series(code);
+      if (!parsed) return null;
+      const { xMin, cl, t, is6A } = parsed;
+      const n = numPoints;
+      const coords = { upper: [], lower: [] };
+      const g = (x) => (1 / (1 - xMin)) * ((1 - x) * Math.log(Math.max(1 - x, 1e-10)) + x * Math.log(Math.max(x, 1e-10)) - x * Math.log(Math.max(xMin, 1e-10)));
+      const dg = (x) => (1 / (1 - xMin)) * (-Math.log(Math.max(1 - x, 1e-10)) - 1 + Math.log(Math.max(x, 1e-10)) + 1 - Math.log(Math.max(xMin, 1e-10)));
+      for (let i = 0; i <= n; i++) {
+        const x = i / n;
+        let yt = 5 * t * (0.2969 * Math.sqrt(x) - 0.1260 * x - 0.3516 * x * x + 0.2843 * x * x * x - 0.1015 * x * x * x * x);
+        if (is6A) yt *= Math.sqrt(1 - x);
+        const yc = (cl / (2 * Math.PI)) * (x <= xMin ? g(x) : g(xMin));
+        const dyc = x <= xMin ? (cl / (2 * Math.PI)) * dg(x) : 0;
+        const th = Math.atan2(dyc, 1);
+        coords.upper.push([x - yt * Math.sin(th), yc + yt * Math.cos(th)]);
+        coords.lower.push([x + yt * Math.sin(th), yc - yt * Math.cos(th)]);
+      }
+      return coords;
+    }
+
+    function generate() {
+      let coords;
+      const numPoints = getNumPoints();
+      syncPointsUI();
+      if (currentSeries === 4) {
+        const v = document.getElementById('naca4').value.replace(/\s/g, '');
+        if (v.length !== 4 || isNaN(parseInt(v, 10))) { alert('NACA 4-digit: use 4 digits (e.g. 2412)'); return; }
+        coords = naca4digit(v, numPoints);
+      } else if (currentSeries === 5) {
+        const v = document.getElementById('naca5').value.replace(/\s/g, '');
+        if (v.length !== 5 || isNaN(parseInt(v, 10))) { alert('NACA 5-digit: use 5 digits (e.g. 23012)'); return; }
+        coords = naca5digit(v, numPoints);
+      } else {
+        const raw = document.getElementById('naca6').value;
+        coords = naca6digit(raw, numPoints);
+        if (!coords) { alert('NACA 6-series: use 63, 64, 65, 66, 67 or 63A, 64A, 65A. E.g. 65-215, 63A-412'); return; }
+      }
+      lastCoords = coords;
+      draw(coords);
+      if (document.getElementById('view3dWrap') && !document.getElementById('view3dWrap').classList.contains('hidden')) {
+        if (window.initView3d) window.initView3d(coords);
+      }
+    }
+
+    function drawPreview(canvas, coords) {
+      const w = canvas.width = 60;
+      const h = canvas.height = 30;
+      const ctx = canvas.getContext('2d');
+      const pad = 2;
+      const pts = [...coords.upper, ...[...coords.lower].reverse()];
+      let minX = 1, maxX = 0, minY = 1, maxY = -1;
+      pts.forEach(([x, y]) => {
+        minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+      });
+      const rangeX = maxX - minX || 1, rangeY = Math.max(maxY - minY, 0.1);
+      const scale = Math.min((w - 2 * pad) / rangeX, (h - 2 * pad) / rangeY);
+      const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+      const tx = w / 2 - cx * scale, ty = h / 2 + cy * scale;
+
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = '#58a6ff';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      const [fx, fy] = pts[0];
+      ctx.moveTo(fx * scale + tx, h - (fy * scale + ty));
+      for (let i = 1; i < pts.length; i++) {
+        const [x, y] = pts[i];
+        ctx.lineTo(x * scale + tx, h - (y * scale + ty));
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    function draw(coords) {
+      const canvas = document.getElementById('previewCanvas');
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      const w = rect.width, h = rect.height;
+      const pad = 40;
+      const pts = [...coords.upper, ...[...coords.lower].reverse()];
+      let minX = 1, maxX = 0, minY = 1, maxY = -1;
+      pts.forEach(([x, y]) => {
+        minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+      });
+      const rangeX = maxX - minX || 1, rangeY = Math.max(maxY - minY, 0.1);
+      const scale = Math.min((w - 2 * pad) / rangeX, (h - 2 * pad) / rangeY);
+      const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+      const tx = w / 2 - cx * scale, ty = h / 2 + cy * scale;
+
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = '#1c1c1c';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, h / 2);
+      ctx.lineTo(w, h / 2);
+      ctx.moveTo(w / 2, 0);
+      ctx.lineTo(w / 2, h);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#58a6ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      const [fx, fy] = pts[0];
+      ctx.moveTo(fx * scale + tx, h - (fy * scale + ty));
+      for (let i = 1; i < pts.length; i++) {
+        const [x, y] = pts[i];
+        ctx.lineTo(x * scale + tx, h - (y * scale + ty));
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    function getAirfoilName() {
+      if (currentSeries === 4) return 'NACA ' + document.getElementById('naca4').value.trim();
+      if (currentSeries === 5) return 'NACA ' + document.getElementById('naca5').value.trim();
+      return 'NACA ' + document.getElementById('naca6').value.trim().replace(/\s/g, ' ');
+    }
+
+    function getAirfoilFilename() {
+      const name = getAirfoilName();
+      return name.replace(/\s+/g, '_').replace(/[^\w\-_.]/g, '') || 'airfoil';
+    }
+
+    function exportDat() {
+      const { upper, lower } = lastCoords;
+      const fmt = document.getElementById('datFormat').value;
+      let s = '';
+      if (fmt === 'original') {
+        s += 'Upper surface\n';
+        upper.forEach(([x, y]) => { s += `${x.toFixed(6)}\t${y.toFixed(6)}\n`; });
+        s += 'Lower surface\n';
+        lower.forEach(([x, y]) => { s += `${x.toFixed(6)}\t${y.toFixed(6)}\n`; });
+      } else if (fmt === 'selig') {
+        s += getAirfoilName() + '\n';
+        upper.forEach(([x, y]) => { s += `${x.toFixed(6)} ${y.toFixed(6)}\n`; });
+        lower.forEach(([x, y]) => { s += `${x.toFixed(6)} ${y.toFixed(6)}\n`; });
+      } else if (fmt === 'lednicer') {
+        s += 'Upper surface\n';
+        upper.forEach(([x, y]) => { s += `${x.toFixed(6)} ${y.toFixed(6)}\n`; });
+        s += 'Lower surface\n';
+        lower.forEach(([x, y]) => { s += `${x.toFixed(6)} ${y.toFixed(6)}\n`; });
+      }
+      download(getAirfoilFilename() + '.dat', s, 'text/plain');
+    }
+
+    function exportCsv() {
+      const { upper, lower } = lastCoords;
+      let s = 'x,y,side\n';
+      upper.forEach(([x, y]) => { s += `${x.toFixed(6)},${y.toFixed(6)},upper\n`; });
+      lower.forEach(([x, y]) => { s += `${x.toFixed(6)},${y.toFixed(6)},lower\n`; });
+      download(getAirfoilFilename() + '.csv', s, 'text/csv');
+    }
+
+    function exportSvg() {
+      const { upper, lower } = lastCoords;
+      const pts = [...upper, ...[...lower].reverse()];
+      let minX = 1, maxX = 0, minY = 1, maxY = -1;
+      pts.forEach(([x, y]) => {
+        minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+      });
+      const rangeX = maxX - minX || 1, rangeY = Math.max(maxY - minY, 0.1);
+      const w = 800, h = 400, pad = 40;
+      const scale = Math.min((w - 2 * pad) / rangeX, (h - 2 * pad) / rangeY);
+      const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+      const tx = w / 2 - cx * scale, ty = h / 2 + cy * scale;
+      const path = pts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${(x * scale + tx).toFixed(2)} ${(h - (y * scale + ty)).toFixed(2)}`).join(' ') + ' Z';
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}"><path fill="none" stroke="#58a6ff" stroke-width="2" d="${path}"/></svg>`;
+      download(getAirfoilFilename() + '.svg', svg, 'image/svg+xml');
+    }
+
+    function exportPng() {
+      const canvas = document.getElementById('previewCanvas');
+      const fname = getAirfoilFilename() + '.png';
+      canvas.toBlob(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fname;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }, 'image/png');
+    }
+
+    function download(name, content, type) {
+      const a = document.createElement('a');
+      a.href = 'data:' + type + ';charset=utf-8,' + encodeURIComponent(content);
+      a.download = name;
+      a.click();
+    }
+
+    document.querySelectorAll('.series-tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentSeries = parseInt(btn.dataset.series, 10);
+        document.querySelectorAll('.series-tabs button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.series-params').forEach(p => p.classList.remove('active'));
+        document.getElementById('params' + currentSeries).classList.add('active');
+      });
+    });
+    document.getElementById('generateBtn').addEventListener('click', generate);
+    document.getElementById('pointsSlider').addEventListener('input', () => {
+      document.getElementById('pointsInput').value = document.getElementById('pointsSlider').value;
+    });
+    document.getElementById('pointsInput').addEventListener('input', () => { syncPointsUI(); });
+    document.getElementById('pointsInput').addEventListener('change', () => { syncPointsUI(); });
+    document.getElementById('view2dBtn').addEventListener('click', () => {
+      if (window.switchTo2d) window.switchTo2d();
+    });
+    document.getElementById('view3dBtn').addEventListener('click', () => {
+      if (window.switchTo3d && lastCoords.upper.length) window.switchTo3d(lastCoords);
+    });
+    document.getElementById('wireframeBtn').addEventListener('click', () => {
+      if (window.toggleWireframe) window.toggleWireframe();
+    });
+    document.getElementById('solidBtn').addEventListener('click', () => {
+      if (window.toggleSolid) window.toggleSolid();
+    });
+    function generatePresetPreview(canvas) {
+      const series = parseInt(canvas.dataset.series, 10);
+      const value = canvas.dataset.value;
+      let coords;
+      const numPoints = 40;
+      if (series === 4) {
+        coords = naca4digit(value, numPoints);
+      } else if (series === 5) {
+        coords = naca5digit(value, numPoints);
+      } else {
+        coords = naca6digit(value, numPoints);
+      }
+      if (coords) drawPreview(canvas, coords);
+    }
+
+    document.querySelectorAll('.preset-item').forEach(item => {
+      const btn = item.querySelector('.btn-preset');
+      const canvas = item.querySelector('.preset-preview');
+      if (canvas) generatePresetPreview(canvas);
+      const handleClick = () => {
+        const series = parseInt(item.dataset.series, 10);
+        const value = item.dataset.value;
+        currentSeries = series;
+        document.querySelectorAll('.series-tabs button').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.series-tabs button[data-series="${series}"]`).classList.add('active');
+        document.querySelectorAll('.series-params').forEach(p => p.classList.remove('active'));
+        document.getElementById('params' + series).classList.add('active');
+        if (series === 4) document.getElementById('naca4').value = value;
+        else if (series === 5) document.getElementById('naca5').value = value;
+        else document.getElementById('naca6').value = value;
+        generate();
+      };
+      item.addEventListener('click', handleClick);
+      if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); handleClick(); });
+    });
+    document.querySelectorAll('.btn-export').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!lastCoords.upper.length) { alert('Generate an airfoil first'); return; }
+        const fmt = btn.dataset.format;
+        if (fmt === 'dat') exportDat();
+        else if (fmt === 'csv') exportCsv();
+        else if (fmt === 'svg') exportSvg();
+        else if (fmt === 'png') exportPng();
+      });
+    });
+
+    generate();
+  </script>
+</body>
+</html>
