@@ -46,13 +46,38 @@
     }
 
     @media (max-width: 900px) {
+      body {
+        height: auto;
+        overflow-y: auto;
+        padding: 1rem;
+      }
+
       .main-layout {
         grid-template-columns: 1fr;
         height: auto;
+        gap: 1.25rem;
       }
 
-      body {
-        overflow-y: auto;
+      .viewer-area {
+        height: 400px;
+        flex: none;
+      }
+
+      .presets-section {
+        height: auto;
+        overflow: visible;
+      }
+
+      .presets-section .presets-panel {
+        height: auto;
+        overflow: visible;
+        display: block;
+      }
+
+      .presets-section .presets-panel .presets {
+        overflow: visible;
+        height: auto;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       }
     }
 
@@ -117,21 +142,36 @@
       overflow: hidden;
     }
 
-    @media (max-width: 1200px) {
-      .presets-section .presets-panel {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    @media (max-width: 900px) {
-      .presets-section .presets-panel {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
     @media (max-width: 600px) {
-      .presets-section .presets-panel {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+
+      h1 {
+        font-size: 1.1rem;
+      }
+
+      .series-tabs {
+        gap: 2px;
+      }
+
+      .series-tabs button {
+        padding: 0.4rem 0.25rem;
+        font-size: 0.75rem;
+      }
+
+      .presets-section .presets-panel .presets {
         grid-template-columns: 1fr;
+      }
+
+      .preset-btns {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      }
+
+      .viewer-area {
+        height: 300px;
       }
     }
 
