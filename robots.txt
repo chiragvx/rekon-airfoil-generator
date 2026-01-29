@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Canonical URL
+Sitemap: https://your-domain.vercel.app/sitemap.xml
