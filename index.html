@@ -87,6 +87,11 @@
       --text: #1a1a1a;
       --muted: #667085;
       --accent: #ff3b1d;
+      --header-bg: rgba(240, 242, 245, 0.85);
+    }
+
+    :root {
+      --header-bg: rgba(5, 5, 5, 0.85);
     }
 
     /* ---- BASE ---- */
@@ -95,7 +100,8 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       padding: 0;
       margin: 0;
     }
@@ -113,17 +119,7 @@
     }
 
     /* HUD Frame */
-    body::after {
-      content: "";
-      position: fixed;
-      top: 12px;
-      left: 12px;
-      right: 12px;
-      bottom: 12px;
-      border: 1px solid var(--border);
-      pointer-events: none;
-      z-index: 9999;
-    }
+    /* Removed fixed decorative border to allow clean page scrolling */
 
     /* ---- LAYOUT ---- */
     .page-header {
@@ -136,7 +132,9 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 24px;
-      background: var(--bg);
+      background: var(--header-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       z-index: 1000;
     }
@@ -181,12 +179,13 @@
     .main-layout {
       position: relative;
       margin-top: 56px;
-      min-height: calc(100vh - 56px - 48px);
       display: grid;
       grid-template-columns: 320px 1fr 340px;
       gap: 0;
       padding: 24px;
       z-index: 1;
+      height: auto;
+      min-height: calc(100vh - 56px);
     }
 
     /* ---- LEFT SECTION (Agent Details) ---- */
@@ -194,7 +193,6 @@
       display: flex;
       flex-direction: column;
       gap: 24px;
-      overflow-y: auto;
       padding-right: 24px;
       border-right: 1px solid var(--border);
     }
@@ -230,6 +228,8 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      min-height: 600px;
+      height: 100%;
     }
 
     /* Targeting grid overlay */
@@ -262,7 +262,7 @@
     .presets-section {
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      overflow: visible;
       padding-left: 24px;
       border-left: 1px solid var(--border);
     }
@@ -576,7 +576,6 @@
 
     .presets {
       flex: 1;
-      overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -736,13 +735,13 @@
     /* ---- FOOTER ---- */
     .site-footer {
       width: 100%;
-      min-height: 48px;
+      min-height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: var(--bg);
       border-top: 1px solid var(--border);
-      padding: 12px 24px;
+      padding: 8px 24px;
       z-index: 100;
     }
 
@@ -895,6 +894,7 @@
 
       .viewer-area {
         height: 400px;
+        min-height: 300px;
       }
 
       .presets-section {
@@ -918,14 +918,14 @@
 
       .footer-content {
         flex-direction: column;
-        gap: 16px;
+        gap: 8px;
         text-align: center;
-        padding: 24px 0;
+        padding: 16px 0;
       }
 
       .footer-links {
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
       }
 
       .footer-divider {
