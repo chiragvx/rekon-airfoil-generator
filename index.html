@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NACA Airfoil Generator & 3D Visualizer | Rekon Labs</title>
+  <title>NACA airfoil generator</title>
   <meta name="description"
     content="Generate accurate NACA 4-digit, 5-digit, and 6-series airfoils. interactive 3D visualization, high-fidelity coordinate export (DAT, CSV, SVG) for CFD and CAD.">
   <meta name="keywords"
@@ -13,21 +13,54 @@
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="NACA Airfoil Generator & 3D Visualizer | Rekon Labs">
+  <meta property="og:title" content="NACA airfoil generator">
   <meta property="og:description"
     content="Professional-grade NACA airfoil generation with interactive 3D modeling and high-fidelity coordinate exporting. Support for complex 6-series profiles.">
   <meta property="og:image" content="assets/logo.png">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:title" content="NACA Airfoil Generator & 3D Visualizer | Rekon Labs">
+  <meta property="twitter:title" content="NACA airfoil generator">
   <meta property="twitter:description"
     content="Generate and visualize accurate NACA airfoils in 3D. Export high-fidelity DAT/CSV coordinates for aerospace engineering.">
   <meta property="twitter:image" content="assets/logo.png">
 
+  <!-- Additional SEO Tags -->
+  <meta name="robots" content="index, follow">
+  <meta name="googlebot" content="index, follow">
+  <link rel="canonical" href="https://rekonlabs.com/naca-generator">
+  <meta name="theme-color" content="#000000">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "NACA Airfoil Generator",
+    "description": "Professional-grade NACA airfoil generation tool with interactive 3D visualization and high-fidelity coordinate exporting for aerospace engineering.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web Browser",
+    "author": {
+      "@type": "Organization",
+      "name": "Rekon Labs",
+      "url": "https://rekonlabs.com"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": ["NACA 4-digit airfoils", "NACA 5-digit airfoils", "NACA 6-series airfoils", "3D visualization", "DAT/CSV/SVG export"]
+  }
+  </script>
+
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Orbitron:wght@500;700&family=Outfit:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+    /* ============================================
+       TACTICAL DASHBOARD - AGENT ALPHA THEME
+       ============================================ */
 
     * {
       box-sizing: border-box;
@@ -36,223 +69,307 @@
     }
 
     :root {
-      --bg: #000000;
-      --surface: #0a0a0a;
-      --border: #1c1c1c;
-      --text: #e8e8e8;
-      --muted: #737373;
-      --accent: #58a6ff;
-      --green: #3fb950;
-      --orange: #d29922;
+      --bg: #050505;
+      --surface: #0f0f0f;
+      --border: #222;
+      --border-light: #333;
+      --text: #e0e0e0;
+      --muted: #666;
+      --accent: #ff3b1d;
+      --green: #4ade80;
     }
 
+    body.light-mode {
+      --bg: #f0f2f5;
+      --surface: #ffffff;
+      --border: #d0d5dd;
+      --border-light: #e4e7ec;
+      --text: #1a1a1a;
+      --muted: #667085;
+      --accent: #ff3b1d;
+    }
+
+    /* ---- BASE ---- */
     body {
-      font-family: 'Outfit', sans-serif;
+      font-family: 'JetBrains Mono', monospace;
       background: var(--bg);
       color: var(--text);
-      height: 100vh;
+      min-height: 100vh;
       overflow: hidden;
-      padding: 1.5rem;
-    }
-
-    .main-layout {
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 1.5rem;
-      align-items: stretch;
-      width: 100%;
-      height: calc(100vh - 3rem);
-      max-width: 100%;
-    }
-
-    @media (max-width: 900px) {
-      body {
-        height: auto;
-        overflow-y: auto;
-        padding: 1rem;
-      }
-
-      .main-layout {
-        grid-template-columns: 1fr;
-        height: auto;
-        gap: 1.25rem;
-      }
-
-      .viewer-area {
-        height: 400px;
-        flex: none;
-      }
-
-      .presets-section {
-        height: auto;
-        overflow: visible;
-      }
-
-      .presets-section .presets-panel {
-        height: auto;
-        overflow: visible;
-        display: block;
-      }
-
-      .presets-section .presets-panel .presets {
-        overflow: visible;
-        height: auto;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      }
-    }
-
-    .left-section {
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-    }
-
-    .right-section {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      min-width: 0;
-      overflow: hidden;
-    }
-
-    .presets-section {
-      margin: 0;
       padding: 0;
-      flex: 1;
-      min-height: 0;
-      overflow: hidden;
+      margin: 0;
     }
 
-    .presets-section .presets-panel {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      grid-template-rows: auto 1fr;
-      gap: 0.75rem 1rem;
-      align-content: start;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
+    /* Subtle dot grid background */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+      background-size: 24px 24px;
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .presets-section .presets-panel h2 {
-      grid-column: 1 / -1;
-      margin-bottom: 0;
+    /* HUD Frame */
+    body::after {
+      content: "";
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      border: 1px solid var(--border);
+      pointer-events: none;
+      z-index: 9999;
     }
 
-    .presets-section .presets-panel .presets {
-      grid-column: 1 / -1;
-      min-width: 0;
-      min-height: 0;
-      width: 100%;
-      overflow-y: auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1rem 1.25rem;
-      align-content: start;
-    }
-
-    .presets-section .presets-panel .preset-group {
-      min-width: 0;
-      width: 100%;
-      min-height: 0;
-    }
-
-    .presets-section .presets-panel.panel {
-      overflow: hidden;
-    }
-
-    @media (max-width: 600px) {
-      .page-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-      }
-
-      h1 {
-        font-size: 1.1rem;
-      }
-
-      .series-tabs {
-        gap: 2px;
-      }
-
-      .series-tabs button {
-        padding: 0.4rem 0.25rem;
-        font-size: 0.75rem;
-      }
-
-      .presets-section .presets-panel .presets {
-        grid-template-columns: 1fr;
-      }
-
-      .preset-btns {
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-      }
-
-      .viewer-area {
-        height: 300px;
-      }
-    }
-
+    /* ---- LAYOUT ---- */
     .page-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
       display: flex;
       align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      z-index: 1000;
     }
 
     .page-header .logo {
-      height: 48px;
-      width: auto;
-      display: block;
-      flex-shrink: 0;
+      height: 22px;
+      opacity: 0.9;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 24px;
+      margin-left: 32px;
+    }
+
+    .nav-tab {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      padding: 18px 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .nav-tab:hover {
+      color: var(--text);
+    }
+
+    .nav-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
     }
 
     h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.35rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      display: none;
     }
 
-    .panel {
+    .main-layout {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      gap: 0;
+      padding: 24px;
+      z-index: 1;
+    }
+
+    /* ---- LEFT SECTION (Agent Details) ---- */
+    .left-section {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      overflow-y: auto;
+      padding-right: 24px;
+      border-right: 1px solid var(--border);
+    }
+
+    /* Custom scrollbar for left section */
+    .left-section::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .left-section::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .left-section::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .left-section::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    /* ---- CENTER (Viewer) + RIGHT (Ops) share .right-section ---- */
+    .right-section {
+      display: contents;
+    }
+
+    .viewer-area {
+      position: relative;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.25rem;
-      overflow-y: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Targeting grid overlay */
+    .viewer-area::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, var(--border) 1px, transparent 1px) 0 0 / 10% 100%,
+        linear-gradient(var(--border) 1px, transparent 1px) 0 0 / 100% 10%;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    /* Targeting crosshair */
+    .viewer-area::after {
+      content: "+";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      color: var(--accent);
+      opacity: 0.2;
+      font-weight: 300;
+      pointer-events: none;
+    }
+
+    /* ---- RIGHT SECTION (Operations List) ---- */
+    .presets-section {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-left: 24px;
+      border-left: 1px solid var(--border);
+    }
+
+    /* ---- PANELS ---- */
+    .panel {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 16px;
+      transition: border-color 0.3s;
+    }
+
+    .panel:hover {
+      border-color: var(--border-light);
+    }
+
+    /* L-shaped corner markers */
+    .panel::before,
+    .panel::after {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-color: var(--accent);
+      border-style: solid;
+      opacity: 0.6;
+    }
+
+    .panel::before {
+      top: 0;
+      left: 0;
+      border-width: 1px 0 0 1px;
+    }
+
+    .panel::after {
+      bottom: 0;
+      right: 0;
+      border-width: 0 1px 1px 0;
+    }
+
+    .panel-meta {
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      font-size: 8px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    /* Right-aligned meta for headers */
+    .panel-meta.right {
+      left: auto;
+      right: 20px;
+      color: var(--muted);
+      opacity: 0.6;
     }
 
     .panel h2 {
-      font-size: 0.75rem;
-      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
       letter-spacing: 0.08em;
-      color: var(--muted);
-      margin-bottom: 1rem;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
+    .panel h2 .count {
+      color: var(--accent);
+      font-weight: 400;
+    }
+
+    /* ---- FORM ELEMENTS ---- */
     .form-group {
-      margin-bottom: 1rem;
+      margin-bottom: 20px;
     }
 
     label {
       display: block;
-      font-size: 0.8rem;
+      font-size: 10px;
+      font-weight: 500;
       color: var(--muted);
-      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
     }
 
     input,
     select {
       width: 100%;
-      padding: 0.5rem 0.75rem;
+      padding: 10px 12px;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 6px;
       color: var(--text);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9rem;
+      font-family: inherit;
+      font-size: 13px;
+      transition: border-color 0.2s;
     }
 
     input:focus,
@@ -261,35 +378,41 @@
       border-color: var(--accent);
     }
 
+    /* ---- SERIES TABS ---- */
     .series-tabs {
       display: flex;
-      gap: 0.25rem;
-      margin-bottom: 1rem;
+      gap: 0;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
     }
 
     .series-tabs button {
       flex: 1;
-      padding: 0.5rem;
-      border: 1px solid var(--border);
-      background: var(--bg);
+      padding: 10px;
+      font-size: 11px;
+      font-family: inherit;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: transparent;
       color: var(--muted);
-      border-radius: 6px;
+      border: none;
       cursor: pointer;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 600;
-      transition: all 0.15s;
+      transition: all 0.2s;
+    }
+
+    .series-tabs button:not(:last-child) {
+      border-right: 1px solid var(--border);
     }
 
     .series-tabs button:hover {
-      border-color: var(--accent);
       color: var(--text);
+      background: var(--surface);
     }
 
     .series-tabs button.active {
-      background: var(--accent);
-      color: var(--bg);
-      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(255, 59, 29, 0.08);
     }
 
     .series-params {
@@ -300,45 +423,39 @@
       display: block;
     }
 
+    /* ---- BUTTONS ---- */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1rem;
-      border: none;
-      border-radius: 6px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.85rem;
+      gap: 8px;
+      padding: 12px 20px;
+      font-family: inherit;
+      font-size: 11px;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
     }
 
     .btn-primary {
-      background: var(--accent);
-      color: var(--bg);
-      width: 100%;
-      margin-top: 0.5rem;
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 700;
     }
 
     .btn-primary:hover {
-      filter: brightness(1.15);
-    }
-
-    .export-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 1rem;
+      background: rgba(255, 59, 29, 0.1);
+      border-color: #ff5e47;
+      color: #ff5e47;
     }
 
     .btn-export {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
       flex: 1;
-      min-width: 80px;
     }
 
     .btn-export:hover {
@@ -346,42 +463,35 @@
       color: var(--green);
     }
 
-    .viewer-area {
-      position: relative;
-      width: 100%;
-      flex: 1;
-      min-height: 0;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
+    .export-buttons {
       display: flex;
-      align-items: center;
-      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
     }
 
+    /* ---- VIEW SWITCHES ---- */
     .view-mode-switch {
       position: absolute;
-      top: 0.75rem;
-      right: 0.75rem;
+      top: 16px;
+      right: 16px;
       z-index: 10;
       display: flex;
-      background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
+      background: rgba(0, 0, 0, 0.6);
     }
 
     .view-mode-switch button {
-      padding: 0.4rem 0.75rem;
-      font-size: 0.75rem;
-      font-family: 'Outfit', sans-serif;
-      font-weight: 600;
-      color: var(--muted);
+      padding: 8px 14px;
+      font-size: 10px;
+      font-family: inherit;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
       background: transparent;
+      color: var(--muted);
       border: none;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.2s;
     }
 
     .view-mode-switch button:hover {
@@ -389,20 +499,18 @@
     }
 
     .view-mode-switch button.active {
-      color: var(--bg);
-      background: var(--accent);
+      color: var(--accent);
+      background: rgba(255, 59, 29, 0.1);
     }
 
     .view-3d-mode-switch {
       position: absolute;
-      bottom: 0.75rem;
-      right: 0.75rem;
+      bottom: 16px;
+      right: 16px;
       z-index: 10;
       display: flex;
-      background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
+      background: rgba(0, 0, 0, 0.6);
     }
 
     .view-3d-mode-switch.hidden {
@@ -410,15 +518,17 @@
     }
 
     .view-3d-mode-switch button {
-      padding: 0.4rem 0.75rem;
-      font-size: 0.75rem;
-      font-family: 'Outfit', sans-serif;
-      font-weight: 600;
-      color: var(--muted);
+      padding: 6px 12px;
+      font-size: 10px;
+      font-family: inherit;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       background: transparent;
+      color: var(--muted);
       border: none;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.2s;
     }
 
     .view-3d-mode-switch button:hover {
@@ -426,16 +536,14 @@
     }
 
     .view-3d-mode-switch button.active {
-      color: var(--bg);
-      background: var(--accent);
+      color: var(--accent);
+      background: rgba(255, 59, 29, 0.1);
     }
 
     .view-2d-wrap,
     .view-3d-wrap {
       position: absolute;
       inset: 0;
-      width: 100%;
-      height: 100%;
     }
 
     .view-2d-wrap.hidden,
@@ -443,12 +551,7 @@
       display: none;
     }
 
-    #previewCanvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
+    #previewCanvas,
     #view3dCanvas {
       width: 100%;
       height: 100%;
@@ -460,133 +563,402 @@
       left: -9999px;
     }
 
-    .hint {
-      font-size: 0.7rem;
-      color: var(--muted);
-      margin-top: 0.25rem;
-    }
-
-    .points-row {
-      margin-top: 1rem;
-    }
-
-    .slider-input-wrap {
+    /* ---- PRESETS / OPERATIONS LIST ---- */
+    .presets-panel {
+      height: 100%;
       display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-top: 0.35rem;
+      flex-direction: column;
+      background: transparent !important;
+      border: none !important;
     }
 
-    .slider-input-wrap input[type="range"] {
-      flex: 1;
-      min-width: 0;
-      accent-color: var(--accent);
-    }
-
-    .points-num {
-      width: 4.5rem;
+    .presets-panel h2 {
       flex-shrink: 0;
-      text-align: center;
-    }
-
-    .dat-format-row {
-      margin-bottom: 0.75rem;
-    }
-
-    .dat-format-row select {
-      margin-top: 0.25rem;
-      font-size: 0.8rem;
-      padding: 0.4rem 0.6rem;
     }
 
     .presets {
-      margin-top: 0;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-right: 8px;
+    }
+
+    /* Custom scrollbar */
+    .presets::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .presets::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .presets::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .presets::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
     }
 
     .preset-group {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
-      min-width: 0;
-    }
-
-    .preset-btns {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-      gap: 0.5rem;
-      width: 100%;
+      gap: 8px;
     }
 
     .preset-label {
-      display: block;
-      font-size: 0.7rem;
+      font-size: 9px;
+      font-weight: 600;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.12em;
+    }
+
+    .preset-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .preset-item {
       display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      padding: 0.35rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    /* Left accent bar on hover */
+    .preset-item::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 2px;
+      height: 100%;
+      background: transparent;
+      transition: background 0.2s;
     }
 
     .preset-item:hover {
-      border-color: var(--accent);
+      border-color: var(--text);
+      background: rgba(255, 255, 255, 0.02);
     }
 
-    .preset-preview {
-      width: 100%;
-      aspect-ratio: 2.4 / 1;
-      min-height: 32px;
-      min-width: 64px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      overflow: hidden;
+    .preset-item:hover::before {
+      background: var(--accent);
     }
 
-    .preset-preview canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
+    .preset-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    .preset-name {
-      margin-top: 0.35rem;
-      font-size: 0.7rem;
-      font-family: 'JetBrains Mono', monospace;
+    .preset-info .code {
+      font-size: 12px;
+      font-weight: 500;
       color: var(--text);
-      text-align: center;
-      line-height: 1.2;
-      pointer-events: none;
     }
 
-    .preset-item:hover .preset-name {
+    .preset-info .desc {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .join-btn {
+      padding: 6px 12px;
+      font-size: 9px;
+      font-family: inherit;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .preset-item:hover .join-btn {
+      border-color: var(--accent);
       color: var(--accent);
     }
 
-    .btn-preset {
+    /* Hide old preset elements */
+    .preset-preview,
+    .preset-name {
       display: none;
+    }
+
+    /* ---- MISC ---- */
+    .hint {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .points-row {
+      margin-top: 16px;
+    }
+
+    .slider-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .slider-input-wrap input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+
+    .points-num {
+      width: 60px;
+      text-align: center;
+    }
+
+    .dat-format-row {
+      margin-bottom: 12px;
+    }
+
+    .dat-format-row select {
+      margin-top: 4px;
+    }
+
+    /* ---- FOOTER ---- */
+    .site-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-logo {
+      height: 18px;
+      opacity: 0.7;
+    }
+
+    .footer-text {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .footer-text span {
+      color: var(--accent);
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .footer-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-link:hover {
+      color: var(--accent);
+    }
+
+    .footer-link svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .footer-divider {
+      width: 1px;
+      height: 16px;
+      background: var(--border);
+    }
+
+    .footer-copyright {
+      font-size: 10px;
+      color: var(--muted);
+      opacity: 0.6;
+    }
+
+    /* ---- THEME TOGGLE ---- */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--accent);
+    }
+
+    .theme-toggle svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    body.light-mode .sun-icon {
+      display: none;
+    }
+
+    body:not(.light-mode) .moon-icon {
+      display: none;
+    }
+
+    .theme-label {
+      display: none;
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 1400px) {
+      .main-layout {
+        grid-template-columns: 300px 1fr 300px;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      .main-layout {
+        grid-template-columns: 280px 1fr;
+      }
+
+      .presets-section {
+        display: none;
+      }
+    }
+
+    @media (max-width: 900px) {
+      body {
+        overflow-y: auto;
+      }
+
+      body::after {
+        display: none;
+      }
+
+      .main-layout {
+        position: relative;
+        top: 0;
+        grid-template-columns: 1fr;
+        height: auto;
+        padding: 80px 16px 60px;
+      }
+
+      .left-section {
+        border-right: none;
+        padding-right: 0;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .viewer-area {
+        height: 400px;
+      }
+
+      .presets-section {
+        display: flex;
+        border-left: none;
+        padding-left: 0;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+        max-height: 400px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .page-header {
+        padding: 0 16px;
+      }
+
+      .nav-tabs {
+        display: none;
+      }
     }
   </style>
 </head>
 
+
+
 <body>
+  <header class="page-header">
+    <div style="display: flex; align-items: center; height: 100%;">
+      <img src="assets/dark.svg" alt="" class="logo" id="navLogo">
+      <nav class="nav-tabs">
+        <a class="nav-tab active">Airfoil generator</a>
+        <!-- Add more tabs here if needed later -->
+      </nav>
+    </div>
+    <button id="themeToggle" class="theme-toggle" title="Toggle Light/Dark Mode">
+      <svg class="sun-icon" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <svg class="moon-icon" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <span class="theme-label">Theme</span>
+    </button>
+  </header>
   <div class="main-layout">
     <aside class="left-section">
-      <header class="page-header">
-        <img src="assets/logo.png" alt="" class="logo">
-        <h1>Rekon Labs - NACA Airfoil Generator</h1>
-      </header>
-      <div class="panel">
-        <h2>Series</h2>
+      <div class="panel" style="margin-bottom: 24px;">
+        <h2>Airfoil Configuration</h2>
+        <div style="font-size: 0.6rem; color: var(--muted); margin-top: -12px; margin-bottom: 16px; line-height: 1.4;">
+          Define geometric parameters for profile generation</div>
+
         <div class="series-tabs">
           <button type="button" data-series="4" class="active">4-digit</button>
           <button type="button" data-series="5">5-digit</button>
@@ -595,7 +967,7 @@
 
         <div id="params4" class="series-params active">
           <div class="form-group">
-            <label>NACA 4-digit (e.g. 2412)</label>
+            <label>NACA 4-Digit Profile</label>
             <input type="text" id="naca4" value="2412" placeholder="MPTT" maxlength="4">
             <div class="hint">M=camber%, P=position×10, TT=thickness%</div>
           </div>
@@ -625,9 +997,13 @@
           <div class="hint">Points per surface (affects export resolution)</div>
         </div>
 
-        <button type="button" class="btn btn-primary" id="generateBtn">Generate</button>
+        <button type="button" class="btn btn-primary" id="generateBtn"
+          style="margin-bottom: 24px; width: 100%;">GENERATE</button>
 
-        <h2 style="margin-top: 1.25rem;">Export</h2>
+      </div>
+
+      <div class="panel">
+        <h2>Coordinate Export</h2>
         <div class="form-group dat-format-row">
           <label>DAT format</label>
           <select id="datFormat">
@@ -646,7 +1022,11 @@
     </aside>
 
     <section class="right-section">
-      <div class="panel viewer-area">
+      <div class="panel viewer-area" style="padding: 0;">
+        <div style="position: absolute; top: 32px; left: 32px; z-index: 10; pointer-events: none;">
+          <div style="font-size: 0.9rem; letter-spacing: 0.15em; color: var(--text); font-weight: 700;">VISUAL PREVIEW
+          </div>
+        </div>
         <div class="view-mode-switch">
           <button type="button" id="view2dBtn" class="active">2D</button>
           <button type="button" id="view3dBtn">3D</button>
@@ -664,131 +1044,119 @@
       </div>
 
       <section class="presets-section">
-        <div class="panel presets-panel">
-          <h2>Popular by use case</h2>
+        <div class="panel library-panel">
+          <h2>Airfoil Library</h2>
+          <div class="series-tabs library-tabs" id="libraryTabs" style="margin-bottom: 16px;">
+            <button type="button" class="active" data-group="high">High RE</button>
+            <button type="button" data-group="low">Low RE</button>
+            <button type="button" data-group="laminar">Laminar</button>
+          </div>
+
           <div class="presets">
-            <div class="preset-group">
-              <span class="preset-label">Low Reynolds</span>
+            <!-- High Reynolds -->
+            <div class="preset-group lib-group-high">
+              <span class="preset-label">HIGH REYNOLDS PROFILES</span>
               <div class="preset-btns">
-                <div class="preset-item" data-series="4" data-value="4412">
-                  <canvas class="preset-preview" data-series="4" data-value="4412"></canvas>
-                  <span class="preset-name">4412</span>
-                </div>
-                <div class="preset-item" data-series="4" data-value="4415">
-                  <canvas class="preset-preview" data-series="4" data-value="4415"></canvas>
-                  <span class="preset-name">4415</span>
-                </div>
-                <div class="preset-item" data-series="6" data-value="6409">
-                  <canvas class="preset-preview" data-series="6" data-value="6409"></canvas>
-                  <span class="preset-name">6409</span>
-                </div>
-                <div class="preset-item" data-series="6" data-value="66-110">
-                  <canvas class="preset-preview" data-series="6" data-value="66-110"></canvas>
-                  <span class="preset-name">66-110</span>
-                </div>
-              </div>
-            </div>
-            <div class="preset-group">
-              <span class="preset-label">High Reynolds</span>
-              <div class="preset-btns">
-                <div class="preset-item" data-series="4" data-value="0012">
-                  <canvas class="preset-preview" data-series="4" data-value="0012"></canvas>
-                  <span class="preset-name">0012</span>
-                </div>
                 <div class="preset-item" data-series="4" data-value="2412">
-                  <canvas class="preset-preview" data-series="4" data-value="2412"></canvas>
-                  <span class="preset-name">2412</span>
+                  <div class="preset-info">
+                    <span class="code">NACA 2412</span>
+                    <span class="desc">General Aviation</span>
+                  </div>
+                  <button class="join-btn">LOAD</button>
                 </div>
                 <div class="preset-item" data-series="5" data-value="23012">
-                  <canvas class="preset-preview" data-series="5" data-value="23012"></canvas>
-                  <span class="preset-name">23012</span>
-                </div>
-                <div class="preset-item" data-series="6" data-value="65-218">
-                  <canvas class="preset-preview" data-series="6" data-value="65-218"></canvas>
-                  <span class="preset-name">65-218</span>
-                </div>
-              </div>
-            </div>
-            <div class="preset-group">
-              <span class="preset-label">Symmetrical</span>
-              <div class="preset-btns">
-                <div class="preset-item" data-series="4" data-value="0006">
-                  <canvas class="preset-preview" data-series="4" data-value="0006"></canvas>
-                  <span class="preset-name">0006</span>
-                </div>
-                <div class="preset-item" data-series="4" data-value="0009">
-                  <canvas class="preset-preview" data-series="4" data-value="0009"></canvas>
-                  <span class="preset-name">0009</span>
-                </div>
-                <div class="preset-item" data-series="4" data-value="0012">
-                  <canvas class="preset-preview" data-series="4" data-value="0012"></canvas>
-                  <span class="preset-name">0012</span>
-                </div>
-                <div class="preset-item" data-series="4" data-value="0015">
-                  <canvas class="preset-preview" data-series="4" data-value="0015"></canvas>
-                  <span class="preset-name">0015</span>
-                </div>
-                <div class="preset-item" data-series="4" data-value="0018">
-                  <canvas class="preset-preview" data-series="4" data-value="0018"></canvas>
-                  <span class="preset-name">0018</span>
-                </div>
-                <div class="preset-item" data-series="4" data-value="0021">
-                  <canvas class="preset-preview" data-series="4" data-value="0021"></canvas>
-                  <span class="preset-name">0021</span>
+                  <div class="preset-info">
+                    <span class="code">NACA 23012</span>
+                    <span class="desc">Transport Class</span>
+                  </div>
+                  <button class="join-btn">LOAD</button>
                 </div>
               </div>
             </div>
-            <div class="preset-group">
-              <span class="preset-label">Cambered (4-digit)</span>
+            <!-- Low Reynolds -->
+            <div class="preset-group lib-group-low" style="margin-top: 0; display: none;">
+              <span class="preset-label">LOW REYNOLDS PROFILES</span>
               <div class="preset-btns">
-                <div class="preset-item" data-series="4" data-value="1408">
-                  <canvas class="preset-preview" data-series="4" data-value="1408"></canvas>
-                  <span class="preset-name">1408</span>
-                </div>
-                <div class="preset-item" data-series="4" data-value="2412">
-                  <canvas class="preset-preview" data-series="4" data-value="2412"></canvas>
-                  <span class="preset-name">2412</span>
-                </div>
-                <div class="preset-item" data-series="4" data-value="2415">
-                  <canvas class="preset-preview" data-series="4" data-value="2415"></canvas>
-                  <span class="preset-name">2415</span>
-                </div>
                 <div class="preset-item" data-series="4" data-value="4412">
-                  <canvas class="preset-preview" data-series="4" data-value="4412"></canvas>
-                  <span class="preset-name">4412</span>
+                  <div class="preset-info">
+                    <span class="code">NACA 4412</span>
+                    <span class="desc">High-Lift Utility</span>
+                  </div>
+                  <button class="join-btn">LOAD</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="4415">
+                  <div class="preset-info">
+                    <span class="code">NACA 4415</span>
+                    <span class="desc">Deep Camber Profile</span>
+                  </div>
+                  <button class="join-btn">LOAD</button>
                 </div>
               </div>
             </div>
-            <div class="preset-group">
-              <span class="preset-label">Special (laminar / 6-series)</span>
+
+            <!-- Laminar Flow -->
+            <div class="preset-group lib-group-laminar" style="margin-top: 0; display: none;">
+              <span class="preset-label">LAMINAR FLOW PROFILES</span>
               <div class="preset-btns">
-                <div class="preset-item" data-series="6" data-value="63-215">
-                  <canvas class="preset-preview" data-series="6" data-value="63-215"></canvas>
-                  <span class="preset-name">63-215</span>
+                <div class="preset-item" data-series="6" data-value="63-212">
+                  <div class="preset-info">
+                    <span class="code">NACA 63-212</span>
+                    <span class="desc">Thin Laminar</span>
+                  </div>
+                  <button class="join-btn">LOAD</button>
                 </div>
-                <div class="preset-item" data-series="6" data-value="64-215">
-                  <canvas class="preset-preview" data-series="6" data-value="64-215"></canvas>
-                  <span class="preset-name">64-215</span>
+                <div class="preset-item" data-series="6" data-value="64-212">
+                  <div class="preset-info">
+                    <span class="code">NACA 64-212</span>
+                    <span class="desc">Laminar Drag Bucket</span>
+                  </div>
+                  <button class="join-btn">LOAD</button>
                 </div>
-                <div class="preset-item" data-series="6" data-value="65-215">
-                  <canvas class="preset-preview" data-series="6" data-value="65-215"></canvas>
-                  <span class="preset-name">65-215</span>
-                </div>
-                <div class="preset-item" data-series="6" data-value="66-206">
-                  <canvas class="preset-preview" data-series="6" data-value="66-206"></canvas>
-                  <span class="preset-name">66-206</span>
-                </div>
-                <div class="preset-item" data-series="6" data-value="65A-215">
-                  <canvas class="preset-preview" data-series="6" data-value="65A-215"></canvas>
-                  <span class="preset-name">65A-215</span>
+                <div class="preset-item" data-series="6" data-value="66-215">
+                  <div class="preset-info">
+                    <span class="code">NACA 66-215</span>
+                    <span class="desc">Extended Laminar</span>
+                  </div>
+                  <button class="join-btn">LOAD</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+
     </section>
   </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <p class="footer-text">REKON AIRFOIL GENERATOR</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/chiragvx" target="_blank" rel="noopener noreferrer" class="footer-link"
+          aria-label="GitHub Profile">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path
+              d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <a href="https://www.linkedin.com/in/chirag-v-287304108/" target="_blank" rel="noopener noreferrer"
+          class="footer-link" aria-label="LinkedIn Profile">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path
+              d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+          </svg>
+          <span>LinkedIn</span>
+        </a>
+        <div class="footer-divider"></div>
+        <span class="footer-copyright">© 2026 Rekon Labs. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
 
   <svg id="svgExport" xmlns="http://www.w3.org/2000/svg"></svg>
 
@@ -834,8 +1202,9 @@
       if (mesh3d && mesh3d.material) mesh3d.material.dispose();
       let mat;
       if (isWireframe) {
+        const isLight = document.body.classList.contains('light-mode');
         mat = new THREE.MeshBasicMaterial({
-          color: 0x58a6ff,
+          color: isLight ? 0x0366d6 : 0xff3b1d,
           wireframe: true,
           side: THREE.DoubleSide,
         });
@@ -850,7 +1219,8 @@
       mesh3d = new THREE.Mesh(geometry, mat);
       if (!scene3d) {
         scene3d = new THREE.Scene();
-        scene3d.background = new THREE.Color(0x0a0a0a);
+        const isLight = document.body.classList.contains('light-mode');
+        scene3d.background = new THREE.Color(isLight ? 0xf5f7f9 : 0x0a0a0a);
         dirLight = new THREE.DirectionalLight(0xffffff, isWireframe ? 0.9 : 1.5);
         dirLight.position.set(2, 2, 2);
         scene3d.add(dirLight);
@@ -865,11 +1235,13 @@
         controls3d.enableDamping = true;
         controls3d.dampingFactor = 0.05;
       } else {
+        const isLight = document.body.classList.contains('light-mode');
+        scene3d.background.set(isLight ? 0xf5f7f9 : 0x0a0a0a);
         if (dirLight && ambLight) updateLighting();
       }
       scene3d.add(mesh3d);
       resize3d();
-      render3d();
+      // render3d() will be handled by switchTo3d
     };
 
     function updateLighting() {
@@ -916,7 +1288,7 @@
     }
 
     function render3d() {
-      if (!renderer3d || !scene3d) return;
+      if (!renderer3d || !scene3d || animId === null) return;
       resize3d();
       controls3d && controls3d.update();
       renderer3d.render(scene3d, camera3d);
@@ -924,8 +1296,10 @@
     }
 
     window.stopView3d = function () {
-      if (animId) cancelAnimationFrame(animId);
-      animId = null;
+      if (animId !== null) {
+        cancelAnimationFrame(animId);
+        animId = null;
+      }
     };
 
     window.switchTo3d = function (coords) {
@@ -934,10 +1308,10 @@
       document.getElementById('view3dModeSwitch').classList.remove('hidden');
       document.getElementById('view2dBtn').classList.remove('active');
       document.getElementById('view3dBtn').classList.add('active');
-      requestAnimationFrame(() => {
-        initView3d(coords);
-        animId = requestAnimationFrame(render3d);
-      });
+
+      stopView3d(); // Ensure no existing loop
+      initView3d(coords);
+      animId = requestAnimationFrame(render3d);
     };
 
     window.switchTo2d = function () {
@@ -947,6 +1321,11 @@
       document.getElementById('view3dModeSwitch').classList.add('hidden');
       document.getElementById('view2dBtn').classList.add('active');
       document.getElementById('view3dBtn').classList.remove('active');
+
+      // Ensure 2D canvas is redrawn when it becomes visible
+      if (lastCoords && lastCoords.upper.length) {
+        draw(lastCoords);
+      }
     };
 
     window.addEventListener('resize', () => { if (document.getElementById('view3dWrap').classList.contains('hidden')) return; resize3d(); });
@@ -1155,6 +1534,7 @@
     }
 
     function drawPreview(canvas, coords) {
+      const isLight = document.body.classList.contains('light-mode');
       const w = 80;
       const h = 34;
       canvas.width = w;
@@ -1172,9 +1552,9 @@
       const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
       const tx = w / 2 - cx * scale, ty = h / 2 + cy * scale;
 
-      ctx.fillStyle = '#0a0a0a';
+      ctx.fillStyle = isLight ? '#ffffff' : '#121212';
       ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = '#58a6ff';
+      ctx.strokeStyle = isLight ? '#0366d6' : '#ff3b1d';
       ctx.lineWidth = 1;
       ctx.beginPath();
       const [fx, fy] = pts[0];
@@ -1188,6 +1568,7 @@
     }
 
     function draw(coords) {
+      const isLight = document.body.classList.contains('light-mode');
       const canvas = document.getElementById('previewCanvas');
       const dpr = Math.min(2, window.devicePixelRatio || 1);
       const rect = canvas.getBoundingClientRect();
@@ -1208,19 +1589,11 @@
       const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
       const tx = w / 2 - cx * scale, ty = h / 2 + cy * scale;
 
-      ctx.fillStyle = '#0a0a0a';
+      ctx.fillStyle = isLight ? '#f8fafc' : '#0d0d0d';
       ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = '#1c1c1c';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(0, h / 2);
-      ctx.lineTo(w, h / 2);
-      ctx.moveTo(w / 2, 0);
-      ctx.lineTo(w / 2, h);
-      ctx.stroke();
 
-      ctx.strokeStyle = '#58a6ff';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = isLight ? '#0366d6' : '#ff3b1d';
+      ctx.lineWidth = 1;
       ctx.beginPath();
       const [fx, fy] = pts[0];
       ctx.moveTo(fx * scale + tx, h - (fy * scale + ty));
@@ -1365,8 +1738,8 @@
         const series = parseInt(item.dataset.series, 10);
         const value = item.dataset.value;
         currentSeries = series;
-        document.querySelectorAll('.series-tabs button').forEach(b => b.classList.remove('active'));
-        document.querySelector(`.series-tabs button[data-series="${series}"]`).classList.add('active');
+        document.querySelectorAll('.left-section .series-tabs button').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.left-section .series-tabs button[data-series="${series}"]`).classList.add('active');
         document.querySelectorAll('.series-params').forEach(p => p.classList.remove('active'));
         document.getElementById('params' + series).classList.add('active');
         if (series === 4) document.getElementById('naca4').value = value;
@@ -1383,6 +1756,70 @@
         else if (fmt === 'csv') exportCsv();
         else if (fmt === 'svg') exportSvg();
         else if (fmt === 'png') exportPng();
+      });
+    });
+
+    // Theme Toggle Logic
+    const themeToggle = document.getElementById('themeToggle');
+    const navLogo = document.getElementById('navLogo');
+    const footerLogo = document.getElementById('footerLogo');
+
+    function updateLogos(isLight) {
+      const logoSrc = isLight ? 'assets/light.svg' : 'assets/dark.svg';
+      if (navLogo) navLogo.src = logoSrc;
+      if (footerLogo) footerLogo.src = logoSrc;
+    }
+
+    const savedTheme = localStorage.getItem('rekon-theme');
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-mode');
+      updateLogos(true);
+    }
+
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+      const isLight = document.body.classList.contains('light-mode');
+      localStorage.setItem('rekon-theme', isLight ? 'light' : 'dark');
+
+      updateLogos(isLight);
+
+      // Update 2D visualizations
+      if (lastCoords.upper.length) draw(lastCoords);
+      drawAllPresetPreviews();
+
+      // Update 3D visualization if active
+      if (scene3d) {
+        scene3d.background.set(isLight ? 0xf5f7f9 : 0x0a0a0a);
+        if (mesh3d) {
+          if (isWireframe) {
+            mesh3d.material.color.set(isLight ? 0x0366d6 : 0xff3b1d);
+          } else {
+            mesh3d.material.color.set(0x888888);
+          }
+        }
+      }
+    });
+
+    // Library Tab Switching Logic
+    const libTabs = document.querySelectorAll('#libraryTabs button');
+    const libGroups = document.querySelectorAll('.preset-group');
+
+    libTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.group;
+
+        // Update active tab
+        libTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Show/Hide groups
+        libGroups.forEach(group => {
+          if (group.classList.contains('lib-group-' + target)) {
+            group.style.display = 'block';
+          } else {
+            group.style.display = 'none';
+          }
+        });
       });
     });
 
