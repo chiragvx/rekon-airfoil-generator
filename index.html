@@ -99,9 +99,11 @@
       font-family: 'JetBrains Mono', monospace;
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-      overflow-y: auto;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       padding: 0;
       margin: 0;
     }
@@ -123,10 +125,7 @@
 
     /* ---- LAYOUT ---- */
     .page-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      flex-shrink: 0;
       height: 56px;
       display: flex;
       align-items: center;
@@ -146,7 +145,8 @@
 
     .nav-tabs {
       display: flex;
-      gap: 24px;
+      gap: 32px;
+      height: 100%;
       margin-left: 32px;
     }
 
@@ -178,14 +178,13 @@
 
     .main-layout {
       position: relative;
-      margin-top: 56px;
+      flex: 1;
       display: grid;
       grid-template-columns: 320px 1fr 340px;
       gap: 0;
       padding: 24px;
       z-index: 1;
-      height: auto;
-      min-height: calc(100vh - 56px);
+      overflow: hidden;
     }
 
     /* ---- LEFT SECTION (Agent Details) ---- */
@@ -195,6 +194,8 @@
       gap: 24px;
       padding-right: 24px;
       border-right: 1px solid var(--border);
+      overflow-y: auto;
+      height: 100%;
     }
 
     /* Custom scrollbar for left section */
@@ -228,7 +229,6 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      min-height: 600px;
       height: 100%;
     }
 
@@ -262,9 +262,22 @@
     .presets-section {
       display: flex;
       flex-direction: column;
-      overflow: visible;
       padding-left: 24px;
       border-left: 1px solid var(--border);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Custom scrollbar for presets section */
+    .presets-section::-webkit-scrollbar {
+      display: none;
+    }
+
+    .library-panel {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding-bottom: 0 !important;
     }
 
     /* ---- PANELS ---- */
@@ -557,8 +570,7 @@
     }
 
     #svgExport {
-      position: absolute;
-      left: -9999px;
+      display: none;
     }
 
     /* ---- PRESETS / OPERATIONS LIST ---- */
@@ -576,10 +588,19 @@
 
     .presets {
       flex: 1;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 16px;
       padding-right: 8px;
+      overflow-y: auto;
+      margin-top: 16px;
+      padding-bottom: 16px;
+    }
+
+    @media (max-width: 1400px) {
+      .presets {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* Custom scrollbar */
@@ -601,9 +622,15 @@
     }
 
     .preset-group {
+      grid-column: 1 / -1;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .preset-group:first-child {
+      margin-top: 0;
     }
 
     .preset-label {
@@ -615,21 +642,26 @@
     }
 
     .preset-btns {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 1600px) {
+      .preset-btns {
+        grid-template-columns: 1fr;
+      }
     }
 
     .preset-item {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 14px;
+      flex-direction: column;
       background: var(--surface);
       border: 1px solid var(--border);
       cursor: pointer;
       transition: all 0.2s;
       position: relative;
+      overflow: hidden;
     }
 
     /* Left accent bar on hover */
@@ -653,21 +685,45 @@
       background: var(--accent);
     }
 
+    .preset-preview-svg {
+      display: block;
+      width: 100%;
+      height: 80px;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid var(--border);
+      pointer-events: none;
+    }
+
+    .preset-preview-svg svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .preset-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      gap: 8px;
+    }
+
     .preset-info {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
+      min-width: 0;
     }
 
     .preset-info .code {
-      font-size: 12px;
-      font-weight: 500;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--text);
     }
 
     .preset-info .desc {
       font-size: 10px;
       color: var(--muted);
+      line-height: 1.4;
     }
 
     .join-btn {
@@ -690,8 +746,6 @@
       color: var(--accent);
     }
 
-    /* Hide old preset elements */
-    .preset-preview,
     .preset-name {
       display: none;
     }
@@ -734,14 +788,15 @@
 
     /* ---- FOOTER ---- */
     .site-footer {
+      flex-shrink: 0;
       width: 100%;
-      min-height: 40px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: var(--bg);
       border-top: 1px solid var(--border);
-      padding: 8px 24px;
+      padding: 0 24px;
       z-index: 100;
     }
 
@@ -870,19 +925,17 @@
 
     @media (max-width: 900px) {
       body {
+        height: auto;
+        min-height: 100vh;
         overflow-y: auto;
-      }
-
-      body::after {
-        display: none;
       }
 
       .main-layout {
         position: relative;
-        margin-top: 56px;
         grid-template-columns: 1fr;
         height: auto;
         padding: 24px 16px;
+        overflow: visible;
       }
 
       .left-section {
@@ -890,6 +943,8 @@
         padding-right: 0;
         padding-bottom: 24px;
         border-bottom: 1px solid var(--border);
+        height: auto;
+        overflow: visible;
       }
 
       .viewer-area {
@@ -916,20 +971,34 @@
         display: none;
       }
 
+      .site-footer {
+        height: auto;
+        min-height: auto;
+        padding: 16px 20px;
+      }
+
       .footer-content {
         flex-direction: column;
-        gap: 8px;
-        text-align: center;
-        padding: 16px 0;
+        gap: 12px;
+        width: 100%;
       }
 
       .footer-links {
-        flex-direction: column;
-        gap: 8px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
       }
 
       .footer-divider {
         display: none;
+      }
+
+      .footer-copyright {
+        width: 100%;
+        text-align: center;
+        margin-top: 4px;
+        order: 3;
       }
     }
   </style>
@@ -1067,69 +1136,621 @@
           <div class="presets">
             <!-- High Reynolds -->
             <div class="preset-group lib-group-high">
-              <span class="preset-label">HIGH REYNOLDS PROFILES</span>
+              <span class="preset-label">HIGH REYNOLDS PROFILES (GA & TRANSPORT)</span>
               <div class="preset-btns">
                 <div class="preset-item" data-series="4" data-value="2412">
-                  <div class="preset-info">
-                    <span class="code">NACA 2412</span>
-                    <span class="desc">General Aviation</span>
+                  <div class="preset-preview-svg" data-series="4" data-value="2412"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 2412</span>
+                      <span class="desc">Standard GA Main Wing</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
                   </div>
-                  <button class="join-btn">LOAD</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="2415">
+                  <div class="preset-preview-svg" data-series="4" data-value="2415"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 2415</span>
+                      <span class="desc">Utility/Cargo Root Section</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0012">
+                  <div class="preset-preview-svg" data-series="4" data-value="0012"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 0012</span>
+                      <span class="desc">Symmetric / Aerobatic Standard</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0015">
+                  <div class="preset-preview-svg" data-series="4" data-value="0015"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 0015</span>
+                      <span class="desc">Deep Symmetric Control Surface</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
                 </div>
                 <div class="preset-item" data-series="5" data-value="23012">
-                  <div class="preset-info">
-                    <span class="code">NACA 23012</span>
-                    <span class="desc">Transport Class</span>
+                  <div class="preset-preview-svg" data-series="5" data-value="23012"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 23012</span>
+                      <span class="desc">Modern Airliner / Transport</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
                   </div>
-                  <button class="join-btn">LOAD</button>
+                </div>
+                <div class="preset-item" data-series="5" data-value="23015">
+                  <div class="preset-preview-svg" data-series="5" data-value="23015"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 23015</span>
+                      <span class="desc">High-Lift Cargo Transport</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="4412">
+                  <div class="preset-preview-svg" data-series="4" data-value="4412"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 4412</span>
+                      <span class="desc">High-Lift STOL Utility</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="4415">
+                  <div class="preset-preview-svg" data-series="4" data-value="4415"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 4415</span>
+                      <span class="desc">Heavy Payload Utility</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="1412">
+                  <div class="preset-preview-svg" data-series="4" data-value="1412"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 1412</span>
+                      <span class="desc">High Speed Efficiency</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0018">
+                  <div class="preset-preview-svg" data-series="4" data-value="0018"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 0018</span>
+                      <span class="desc">Extreme Aerobatic / Structural</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="2418">
+                  <div class="preset-preview-svg" data-series="4" data-value="2418"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 2418</span>
+                      <span class="desc">Thick Root Assembly Section</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="5" data-value="23018">
+                  <div class="preset-preview-svg" data-series="5" data-value="23018"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 23018</span>
+                      <span class="desc">Heavy Root Transport Joint</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0009">
+                  <div class="preset-preview-svg" data-series="4" data-value="0009"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 0009</span>
+                      <span class="desc">Horizontal / Vertical Tail Fin</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0006">
+                  <div class="preset-preview-svg" data-series="4" data-value="0006"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 0006</span>
+                      <span class="desc">High-Speed Thin Tail Surface</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="2410">
+                  <div class="preset-preview-svg" data-series="4" data-value="2410"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 2410</span>
+                      <span class="desc">Thin Propeller Root Region</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="4418">
+                  <div class="preset-preview-svg" data-series="4" data-value="4418"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 4418</span>
+                      <span class="desc">Ultra High Camber Root</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="5" data-value="23021">
+                  <div class="preset-preview-svg" data-series="5" data-value="23021"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 23021</span>
+                      <span class="desc">Deep Spar Heavy Transport</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0021">
+                  <div class="preset-preview-svg" data-series="4" data-value="0021"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 0021</span>
+                      <span class="desc">Thick Control Blade Standard</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="2421">
+                  <div class="preset-preview-svg" data-series="4" data-value="2421"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 2421</span>
+                      <span class="desc">Structural Root Truss Section</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="2424">
+                  <div class="preset-preview-svg" data-series="4" data-value="2424"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 2424</span>
+                      <span class="desc">Extreme Thickness Root Base</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
                 </div>
               </div>
             </div>
+
             <!-- Low Reynolds -->
             <div class="preset-group lib-group-low" style="margin-top: 0; display: none;">
-              <span class="preset-label">LOW REYNOLDS PROFILES</span>
+              <span class="preset-label">LOW REYNOLDS PROFILES (UAS & RC)</span>
               <div class="preset-btns">
                 <div class="preset-item" data-series="4" data-value="4412">
-                  <div class="preset-info">
-                    <span class="code">NACA 4412</span>
-                    <span class="desc">High-Lift Utility</span>
+                  <div class="preset-preview-svg" data-series="4" data-value="4412"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 4412</span>
+                      <span class="desc">Heavy Lift UAS Profile</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
                   </div>
-                  <button class="join-btn">LOAD</button>
                 </div>
                 <div class="preset-item" data-series="4" data-value="4415">
-                  <div class="preset-info">
-                    <span class="code">NACA 4415</span>
-                    <span class="desc">Deep Camber Profile</span>
+                  <div class="preset-preview-svg" data-series="4" data-value="4415"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 4415</span>
+                      <span class="desc">High Camber Heavy UAS</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
                   </div>
-                  <button class="join-btn">LOAD</button>
+                </div>
+                <div class="preset-item" data-series="4" data-value="2410">
+                  <div class="preset-preview-svg" data-series="4" data-value="2410"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 2410</span>
+                      <span class="desc">Efficient Cruise UAS Wing</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="1408">
+                  <div class="preset-preview-svg" data-series="4" data-value="1408"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 1408</span>
+                      <span class="desc">High-Speed Racing UAS</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0010">
+                  <div class="preset-preview-svg" data-series="4" data-value="0010"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 0010</span>
+                      <span class="desc">Precision Symmetric Tail Fin</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="2408">
+                  <div class="preset-preview-svg" data-series="4" data-value="2408"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 2408</span>
+                      <span class="desc">Ultra Thin High Efficiency Wing</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="6409">
+                  <div class="preset-preview-svg" data-series="4" data-value="6409"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 6409</span>
+                      <span class="desc">Extreme High Lift Foil</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="4410">
+                  <div class="preset-preview-svg" data-series="4" data-value="4410"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 4410</span>
+                      <span class="desc">Balanced High-Lift Profile</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="1410">
+                  <div class="preset-preview-svg" data-series="4" data-value="1410"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 1410</span>
+                      <span class="desc">Fast Utility Cruise Wing</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0008">
+                  <div class="preset-preview-svg" data-series="4" data-value="0008"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 0008</span>
+                      <span class="desc">Ultra Thin Tail Section</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="2412">
+                  <div class="preset-preview-svg" data-series="4" data-value="2412"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 2412 (Scaled)</span>
+                      <span class="desc">RC Scale Multi-Purpose Foil</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="3412">
+                  <div class="preset-preview-svg" data-series="4" data-value="3412"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 3412</span>
+                      <span class="desc">Medium Camber Scaled Wing</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="4408">
+                  <div class="preset-preview-svg" data-series="4" data-value="4408"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 4408</span>
+                      <span class="desc">Thin High-Lift Profile</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="0009">
+                  <div class="preset-preview-svg" data-series="4" data-value="0009"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 0009</span>
+                      <span class="desc">Standard Control Surface Fine</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="1412">
+                  <div class="preset-preview-svg" data-series="4" data-value="1412"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 1412</span>
+                      <span class="desc">Scaled Racing Efficiency</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="5" data-value="23010">
+                  <div class="preset-preview-svg" data-series="5" data-value="23010"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 23010</span>
+                      <span class="desc">Thin Scaled Transport Wing</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="5" data-value="23012">
+                  <div class="preset-preview-svg" data-series="5" data-value="23012"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 23012</span>
+                      <span class="desc">Scaled Transport Assembly</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="3410">
+                  <div class="preset-preview-svg" data-series="4" data-value="3410"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 3410</span>
+                      <span class="desc">Optimized UAS Lift/Drag</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="6412">
+                  <div class="preset-preview-svg" data-series="4" data-value="6412"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 6412</span>
+                      <span class="desc">High Endurance Cargo UAS</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="4" data-value="4418">
+                  <div class="preset-preview-svg" data-series="4" data-value="4418"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 4418</span>
+                      <span class="desc">Deep Lift UAS Main Wing</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
                 </div>
               </div>
             </div>
 
             <!-- Laminar Flow -->
             <div class="preset-group lib-group-laminar" style="margin-top: 0; display: none;">
-              <span class="preset-label">LAMINAR FLOW PROFILES</span>
+              <span class="preset-label">LAMINAR FLOW PROFILES (6-SERIES)</span>
               <div class="preset-btns">
                 <div class="preset-item" data-series="6" data-value="63-212">
-                  <div class="preset-info">
-                    <span class="code">NACA 63-212</span>
-                    <span class="desc">Thin Laminar</span>
+                  <div class="preset-preview-svg" data-series="6" data-value="63-212"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 63-212</span>
+                      <span class="desc">Precision Laminar Balance</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
                   </div>
-                  <button class="join-btn">LOAD</button>
                 </div>
                 <div class="preset-item" data-series="6" data-value="64-212">
-                  <div class="preset-info">
-                    <span class="code">NACA 64-212</span>
-                    <span class="desc">Laminar Drag Bucket</span>
+                  <div class="preset-preview-svg" data-series="6" data-value="64-212"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 64-212</span>
+                      <span class="desc">Classic Laminar Efficiency</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
                   </div>
-                  <button class="join-btn">LOAD</button>
+                </div>
+                <div class="preset-item" data-series="6" data-value="65-212">
+                  <div class="preset-preview-svg" data-series="6" data-value="65-212"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 65-212</span>
+                      <span class="desc">Optimized Drag Bucket</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="66-212">
+                  <div class="preset-preview-svg" data-series="6" data-value="66-212"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 66-212</span>
+                      <span class="desc">High Critical Mach Number</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="63-412">
+                  <div class="preset-preview-svg" data-series="6" data-value="63-412"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 63-412</span>
+                      <span class="desc">High-Lift Laminar Wing</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="64-412">
+                  <div class="preset-preview-svg" data-series="6" data-value="64-412"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 64-412</span>
+                      <span class="desc">Standard Laminar Transporter</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="65-412">
+                  <div class="preset-preview-svg" data-series="6" data-value="65-412"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 65-412</span>
+                      <span class="desc">Long-Range Efficiency FOIL</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="66-415">
+                  <div class="preset-preview-svg" data-series="6" data-value="66-415"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 66-415</span>
+                      <span class="desc">Deep Spar Structural Laminar</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="63-206">
+                  <div class="preset-preview-svg" data-series="6" data-value="63-206"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 63-206</span>
+                      <span class="desc">Ultra Thin High Speed Laminar</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="64-106">
+                  <div class="preset-preview-svg" data-series="6" data-value="64-106"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 64-106</span>
+                      <span class="desc">High Speed Research Wing</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="65-106">
+                  <div class="preset-preview-svg" data-series="6" data-value="65-106"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 65-106</span>
+                      <span class="desc">Ultra Low Drag Fin Surface</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="63-415">
+                  <div class="preset-preview-svg" data-series="6" data-value="63-415"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 63-415</span>
+                      <span class="desc">STOL Capable Laminar Foil</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="64-210">
+                  <div class="preset-preview-svg" data-series="6" data-value="64-210"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 64-210</span>
+                      <span class="desc">Balanced Propeller Laminar</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="65-210">
+                  <div class="preset-preview-svg" data-series="6" data-value="65-210"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 65-210</span>
+                      <span class="desc">Optimized Propeller Outboard</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="64-110">
+                  <div class="preset-preview-svg" data-series="6" data-value="64-110"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 64-110</span>
+                      <span class="desc">Low Camber High Speed Cruise</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
                 </div>
                 <div class="preset-item" data-series="6" data-value="66-215">
-                  <div class="preset-info">
-                    <span class="code">NACA 66-215</span>
-                    <span class="desc">Extended Laminar</span>
+                  <div class="preset-preview-svg" data-series="6" data-value="66-215"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 66-215</span>
+                      <span class="desc">Extended Drag Bucket Modern</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
                   </div>
-                  <button class="join-btn">LOAD</button>
+                </div>
+                <div class="preset-item" data-series="6" data-value="67-215">
+                  <div class="preset-preview-svg" data-series="6" data-value="67-215"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 67-215</span>
+                      <span class="desc">Transonic Research Standard</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="63-215">
+                  <div class="preset-preview-svg" data-series="6" data-value="63-215"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 63-215</span>
+                      <span class="desc">General Purpose Laminar Main</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="64-215">
+                  <div class="preset-preview-svg" data-series="6" data-value="64-215"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 64-215</span>
+                      <span class="desc">High Lift Modern Cruise Wing</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
+                </div>
+                <div class="preset-item" data-series="6" data-value="65-215">
+                  <div class="preset-preview-svg" data-series="6" data-value="65-215"></div>
+                  <div class="preset-footer">
+                    <div class="preset-info">
+                      <span class="code">NACA 65-215</span>
+                      <span class="desc">Modern GA High Performance</span>
+                    </div>
+                    <button class="join-btn">LOAD</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1547,12 +2168,16 @@
 
     function drawPreview(canvas, coords) {
       const isLight = document.body.classList.contains('light-mode');
-      const w = 80;
-      const h = 34;
-      canvas.width = w;
-      canvas.height = h;
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width, h = rect.height;
+
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
       const ctx = canvas.getContext('2d');
-      const pad = 2;
+      ctx.scale(dpr, dpr);
+
+      const pad = 12;
       const pts = [...coords.upper, ...[...coords.lower].reverse()];
       let minX = 1, maxX = 0, minY = 1, maxY = -1;
       pts.forEach(([x, y]) => {
@@ -1564,10 +2189,21 @@
       const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
       const tx = w / 2 - cx * scale, ty = h / 2 + cy * scale;
 
-      ctx.fillStyle = isLight ? '#ffffff' : '#121212';
-      ctx.fillRect(0, 0, w, h);
+      // Clear background
+      ctx.clearRect(0, 0, w, h);
+
+      // Subtle Grid Overlay
+      ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i <= w; i += w / 10) {
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke();
+      }
+      for (let i = 0; i <= h; i += h / 4) {
+        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(w, i); ctx.stroke();
+      }
+
       ctx.strokeStyle = isLight ? '#0366d6' : '#ff3b1d';
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
       const [fx, fy] = pts[0];
       ctx.moveTo(fx * scale + tx, h - (fy * scale + ty));
@@ -1577,6 +2213,12 @@
       }
       ctx.closePath();
       ctx.stroke();
+
+      // Leading edge highlight
+      ctx.fillStyle = isLight ? '#0366d6' : '#ff3b1d';
+      ctx.beginPath();
+      ctx.arc(pts[0][0] * scale + tx, h - (pts[0][1] * scale + ty), 1.5, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     function draw(coords) {
@@ -1723,35 +2365,65 @@
     document.getElementById('solidBtn').addEventListener('click', () => {
       if (window.toggleSolid) window.toggleSolid();
     });
-    function generatePresetPreview(canvas) {
-      const series = parseInt(canvas.dataset.series, 10);
-      const value = canvas.dataset.value;
+    function generatePresetPreview(container) {
+      const series = parseInt(container.dataset.series, 10);
+      const value = container.dataset.value;
       let coords;
-      const numPoints = 40;
-      if (series === 4) {
-        coords = naca4digit(value, numPoints);
-      } else if (series === 5) {
-        coords = naca5digit(value, numPoints);
-      } else {
-        coords = naca6digit(value, numPoints);
-      }
-      if (coords) drawPreview(canvas, coords);
+      const numPoints = 60;
+      if (series === 4) coords = naca4digit(value, numPoints);
+      else if (series === 5) coords = naca5digit(value, numPoints);
+      else coords = naca6digit(value, numPoints);
+
+      if (!coords) return;
+
+      const isLight = document.body.classList.contains('light-mode');
+      const pts = [...coords.upper, ...[...coords.lower].reverse()];
+      let minX = 1, maxX = 0, minY = 1, maxY = -1;
+      pts.forEach(([x, y]) => {
+        minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+      });
+      const rangeX = maxX - minX || 1, rangeY = Math.max(maxY - minY, 0.1);
+      const w = 300, h = 80, pad = 15;
+      const scale = Math.min((w - 2 * pad) / rangeX, (h - 2 * pad) / rangeY);
+      const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+      const tx = w / 2 - cx * scale, ty = h / 2 + cy * scale;
+
+      const pathData = pts.map(([x, y], i) =>
+        `${i === 0 ? 'M' : 'L'} ${(x * scale + tx).toFixed(2)} ${(h - (y * scale + ty)).toFixed(2)}`
+      ).join(' ') + ' Z';
+
+      const strokeColor = isLight ? '#0366d6' : '#ff3b1d';
+      const gridColor = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
+
+      container.innerHTML = `
+        <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <pattern id="grid" width="${w / 10}" height="${h / 4}" patternUnits="userSpaceOnUse">
+              <path d="M ${w / 10} 0 L 0 0 0 ${h / 4}" fill="none" stroke="${gridColor}" stroke-width="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+          <path d="${pathData}" fill="none" stroke="${strokeColor}" stroke-width="2" stroke-linejoin="round" />
+          <circle cx="${pts[0][0] * scale + tx}" cy="${h - (pts[0][1] * scale + ty)}" r="2" fill="${strokeColor}" />
+        </svg>
+      `;
     }
 
     function drawAllPresetPreviews() {
-      document.querySelectorAll('.preset-item .preset-preview').forEach(canvas => {
-        if (canvas && canvas.dataset.series && canvas.dataset.value) generatePresetPreview(canvas);
+      document.querySelectorAll('.preset-preview-svg').forEach(container => {
+        generatePresetPreview(container);
       });
     }
+
     document.querySelectorAll('.preset-item').forEach(item => {
-      const canvas = item.querySelector('.preset-preview');
-      if (canvas) generatePresetPreview(canvas);
       item.addEventListener('click', () => {
         const series = parseInt(item.dataset.series, 10);
         const value = item.dataset.value;
         currentSeries = series;
         document.querySelectorAll('.left-section .series-tabs button').forEach(b => b.classList.remove('active'));
-        document.querySelector(`.left-section .series-tabs button[data-series="${series}"]`).classList.add('active');
+        const tab = document.querySelector(`.left-section .series-tabs button[data-series="${series}"]`);
+        if (tab) tab.classList.add('active');
         document.querySelectorAll('.series-params').forEach(p => p.classList.remove('active'));
         document.getElementById('params' + series).classList.add('active');
         if (series === 4) document.getElementById('naca4').value = value;
@@ -1760,6 +2432,9 @@
         generate();
       });
     });
+
+    // Cleanup old drawPreview since we use SVGs now
+    function drawPreview(canvas, coords) { /* Deprecated */ }
     document.querySelectorAll('.btn-export').forEach(btn => {
       btn.addEventListener('click', () => {
         if (!lastCoords.upper.length) { alert('Generate an airfoil first'); return; }
