@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | AirfoilNACA</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="icon" href="assets/favicon.png" type="image/png">
+    <style>
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 56px);
+            text-align: center;
+            padding: 0 24px;
+        }
+
+        .error-code {
+            font-size: 8rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0;
+            line-height: 1;
+        }
+
+        .error-msg {
+            font-size: 1.5rem;
+            color: var(--text);
+            margin-bottom: 24px;
+        }
+
+        .error-desc {
+            color: var(--muted);
+            max-width: 500px;
+            margin-bottom: 32px;
+        }
+
+        .back-home {
+            display: inline-block;
+            padding: 12px 24px;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            transition: all 0.2s;
+        }
+
+        .back-home:hover {
+            background: rgba(255, 59, 29, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <header class="page-header">
+        <div style="display: flex; align-items: center; height: 100%;">
+            <img src="assets/dark.svg" alt="NACA Airfoil Generator Logo" class="logo" id="navLogo">
+            <nav class="nav-tabs">
+                <a href="/" class="nav-tab">Airfoil generator</a>
+            </nav>
+        </div>
+    </header>
+    <div class="error-container">
+        <div class="error-code">404</div>
+        <div class="error-msg">COORDINATES LOST</div>
+        <div class="error-desc">
+            The airfoil section you are looking for does not exist in our database.
+            It may have been moved or the URL might be incorrect.
+        </div>
+        <a href="/" class="back-home">Return to Flight Control</a>
+    </div>
+    <script>
+        // Simple theme logic for 404
+        const navLogo = document.getElementById('navLogo');
+        const savedTheme = localStorage.getItem('rekon-theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+            if (navLogo) navLogo.src = 'assets/light.svg';
+        }
+    </script>
+</body>
+
+</html>
