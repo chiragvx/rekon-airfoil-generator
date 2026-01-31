@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-# Canonical URL
-Sitemap: https://your-domain.vercel.app/sitemap.xml
+# Sitemap
+Sitemap: https://airfoilnaca.xyz/sitemap.xml

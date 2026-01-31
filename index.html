@@ -4,31 +4,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NACA airfoil generator</title>
+  <title>NACA Airfoil Generator | 4-Digit, 5-Digit & 6-Series | airfoilnaca.xyz</title>
   <meta name="description"
-    content="Generate accurate NACA 4-digit, 5-digit, and 6-series airfoils. interactive 3D visualization, high-fidelity coordinate export (DAT, CSV, SVG) for CFD and CAD.">
+    content="Free online NACA airfoil generator. Create accurate 4-digit, 5-digit, and 6-series NACA airfoils with interactive 3D visualization. Export coordinates in DAT, CSV, and SVG formats for CFD and CAD applications.">
   <meta name="keywords"
-    content="NACA airfoil generator, airfoil coordinates, 65(2)-215, aerodynamic profiling, 3D airfoil visualizer, Rekon Labs, CFD coordinates">
-  <meta name="author" content="Rekon Labs">
+    content="NACA airfoil generator, NACA 4-digit, NACA 5-digit, NACA 6-series, airfoil coordinates, 2412, 4412, 0012, 23012, 65-215, aerodynamic design, 3D airfoil, DAT export, CSV export, SVG export, wing design tool, aerospace engineering">
+  <meta name="author" content="AirfoilNACA">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="NACA airfoil generator">
+  <meta property="og:url" content="https://airfoilnaca.xyz">
+  <meta property="og:title" content="NACA Airfoil Generator - Professional Aerodynamic Design Tool">
   <meta property="og:description"
-    content="Professional-grade NACA airfoil generation with interactive 3D modeling and high-fidelity coordinate exporting. Support for complex 6-series profiles.">
-  <meta property="og:image" content="assets/logo.png">
+    content="Generate, visualize, and export high-fidelity NACA airfoil coordinates. Support for 4-digit, 5-digit, and complex 6-series profiles with 3D preview.">
+  <meta property="og:image" content="https://airfoilnaca.xyz/assets/og-image.png">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:title" content="NACA airfoil generator">
+  <meta property="twitter:url" content="https://airfoilnaca.xyz">
+  <meta property="twitter:title" content="NACA Airfoil Generator | 4-Digit, 5-Digit & 6-Series">
   <meta property="twitter:description"
-    content="Generate and visualize accurate NACA airfoils in 3D. Export high-fidelity DAT/CSV coordinates for aerospace engineering.">
-  <meta property="twitter:image" content="assets/logo.png">
+    content="The definitive tool for aerospace engineers and hobbyists to generate and export accurate NACA airfoil coordinates.">
+  <meta property="twitter:image" content="https://airfoilnaca.xyz/assets/og-image.png">
 
   <!-- Additional SEO Tags -->
   <meta name="robots" content="index, follow">
   <meta name="googlebot" content="index, follow">
-  <link rel="canonical" href="https://rekonlabs.com/naca-generator">
+  <link rel="canonical" href="https://airfoilnaca.xyz">
   <meta name="theme-color" content="#000000">
 
   <!-- Structured Data -->
@@ -41,9 +43,9 @@
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Web Browser",
     "author": {
-      "@type": "Organization",
-      "name": "Rekon Labs",
-      "url": "https://rekonlabs.com"
+      "@type": "Person",
+      "name": "AirfoilNACA Team",
+      "url": "https://airfoilnaca.xyz"
     },
     "offers": {
       "@type": "Offer",
@@ -99,11 +101,12 @@
       font-family: 'JetBrains Mono', monospace;
       background: var(--bg);
       color: var(--text);
-      height: 100vh;
+      min-height: 100vh;
       width: 100vw;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       padding: 0;
       margin: 0;
     }
@@ -173,12 +176,20 @@
     }
 
     h1 {
-      display: none;
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .main-layout {
       position: relative;
-      flex: 1;
+      height: calc(100vh - 56px);
       display: grid;
       grid-template-columns: 320px 1fr 340px;
       gap: 0;
@@ -790,13 +801,14 @@
     .site-footer {
       flex-shrink: 0;
       width: 100%;
-      height: 32px;
+      height: auto;
+      min-height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: var(--bg);
       border-top: 1px solid var(--border);
-      padding: 0 24px;
+      padding: 8px 24px;
       z-index: 100;
     }
 
@@ -1001,6 +1013,42 @@
         order: 3;
       }
     }
+
+    /* ---- SEO CONTENT SECTION ---- */
+    .seo-info-section {
+      max-width: 1200px;
+      margin: 48px auto;
+      padding: 0 24px 64px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .seo-info-section h2 {
+      font-size: 18px;
+      color: var(--text);
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .seo-info-section h3 {
+      font-size: 14px;
+      color: var(--text);
+      margin: 24px 0 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .seo-info-section p {
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .seo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 32px;
+    }
   </style>
 </head>
 
@@ -1009,7 +1057,7 @@
 <body>
   <header class="page-header">
     <div style="display: flex; align-items: center; height: 100%;">
-      <img src="assets/dark.svg" alt="" class="logo" id="navLogo">
+      <img src="assets/dark.svg" alt="NACA Airfoil Generator Logo" class="logo" id="navLogo">
       <nav class="nav-tabs">
         <a class="nav-tab active">Airfoil generator</a>
         <!-- Add more tabs here if needed later -->
@@ -1037,8 +1085,9 @@
     <aside class="left-section">
       <div class="panel" style="margin-bottom: 24px;">
         <h2>Airfoil Configuration</h2>
+        <h1 style="display: none;">Free Online NACA Airfoil Generator - 4, 5, and 6-Series Coordinates</h1>
         <div style="font-size: 0.6rem; color: var(--muted); margin-top: -12px; margin-bottom: 16px; line-height: 1.4;">
-          Define geometric parameters for profile generation</div>
+          Define geometric parameters for professional-grade profile generation</div>
 
         <div class="series-tabs">
           <button type="button" data-series="4" class="active">4-digit</button>
@@ -1766,7 +1815,7 @@
   <footer class="site-footer">
     <div class="footer-content">
       <div class="footer-brand">
-        <p class="footer-text">REKON AIRFOIL GENERATOR</p>
+        <p class="footer-text">AIRFOILNACA GENERATOR</p>
       </div>
       <div class="footer-links">
         <a href="https://github.com/chiragvx/rekon-airfoil-generator" target="_blank" rel="noopener noreferrer"
@@ -1786,10 +1835,61 @@
           <span>LinkedIn</span>
         </a>
         <div class="footer-divider"></div>
-        <span class="footer-copyright">© 2026 Rekon Labs. All rights reserved.</span>
+        <span class="footer-copyright">© 2026 AirfoilNACA. All rights reserved.</span>
       </div>
     </div>
   </footer>
+
+  <section class="seo-info-section">
+    <h2>About NACA Airfoils & This Generator</h2>
+    <div class="seo-grid">
+      <div>
+        <h3>What are NACA Airfoils?</h3>
+        <p>
+          The NACA airfoils are airfoil shapes for aircraft wings developed by the National Advisory Committee for
+          Aeronautics (NACA). The shape of the NACA airfoils is described using a series of digits following the word
+          "NACA". The numerical code for the shapes can be entered into equations that precisely generate the
+          cross-section of the airfoil and calculate its properties.
+        </p>
+        <h3>NACA 4-Digit Series</h3>
+        <p>
+          The NACA four-digit series defines the profile by: 1st digit describing maximum camber as percentage of the
+          chord, 2nd digit describing the distance of maximum camber from the airfoil leading edge in tens of percents
+          of the chord, and the last two digits describing maximum thickness of the airfoil as percent of the chord.
+          Example: <strong>NACA 2412</strong> has a max camber of 2% located 40% (0.4 chord) from the leading edge with
+          a maximum thickness of 12% of the chord.
+        </p>
+      </div>
+      <div>
+        <h3>NACA 5-Digit Series</h3>
+        <p>
+          The NACA five-digit series describes more complex shapes. The first digit, when multiplied by 0.15, gives the
+          designed lift coefficient (CL). The next two digits, when divided by 2, give the location of maximum camber
+          (P) in percent of chord. The final two digits give the maximum thickness in percent of chord (T).
+        </p>
+        <h3>NACA 6-Series Laminar Flow</h3>
+        <p>
+          The 6-series was designed to maximize laminar flow. These airfoils are described using six digits (e.g.,
+          <strong>NACA 65(2)-215</strong>). This generator supports the complex equations required for these
+          high-performance
+          profiles, providing exact mean lines and thickness distributions based on NASA TM 4741.
+        </p>
+      </div>
+      <div>
+        <h3>Professional Export Formats</h3>
+        <p>
+          This tool generates high-fidelity coordinates compatible with professional CFD (Computational Fluid Dynamics)
+          and CAD (Computer-Aided Design) software.
+        </p>
+        <ul>
+          <li><strong>DAT (Selig/Lednicer):</strong> Ready for XFOIL, MSES, and other analysis tools.</li>
+          <li><strong>CSV:</strong> Perfect for Excel analysis or custom scripting.</li>
+          <li><strong>SVG:</strong> Scalable vector graphics for documentation or laser cutting.</li>
+          <li><strong>3D Preview:</strong> Interactive wireframe and solid modeling for visual verification.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
   <svg id="svgExport" xmlns="http://www.w3.org/2000/svg"></svg>
 
